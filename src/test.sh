@@ -22,5 +22,6 @@ assert() {
 }
 
 assert 0 0
+assert 4 "3 + 4 - 3" # todo
 
 echo OK
