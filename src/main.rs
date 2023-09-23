@@ -40,11 +40,11 @@ fn tree() {
     let mut iter = tokenize(&args[1]);
 
     let node = iter.expr();
-	if let Some(b) = node {
-		tokenizer::gen(&b);
-	}
+    if let Some(b) = node {
+        tokenizer::gen(&b);
+    }
+    println!("  pop rax");
     println!("  ret");
-
 }
 
 fn main() {

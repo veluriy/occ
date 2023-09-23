@@ -67,8 +67,8 @@ pub fn gen(node: &Node) {
         Token::Div => {
             println!("  cqo");
             println!("  idiv rdi");
-        },
-        _ => {},
+        }
+        _ => {}
     };
     println!("  push rax");
 }
