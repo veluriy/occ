@@ -1,4 +1,3 @@
-// https://qiita.com/AtsukiTak/items/0819ee57af2639891ecf
 fn split_digit(s: &str) -> (&str, &str) {
     let first_non_num_idx = s.find(|c| !char::is_numeric(c)).unwrap_or(s.len());
     s.split_at(first_non_num_idx)
@@ -36,7 +35,7 @@ fn new_node(kind: Token, lhs: Option<Box<Node>>, rhs: Option<Box<Node>>) -> Opti
     return node;
 }
 
-/// 数字の節
+/// 数字に対応した節
 fn new_node_num(val: Num) -> Option<Box<Node>> {
     let node = Node {
         kind: Token::Num(val),
