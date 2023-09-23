@@ -18,7 +18,7 @@ pub enum Token {
     Num(Num),
 }
 
-// 構文木
+/// 構文木
 #[derive(Debug)]
 pub struct Node {
     kind: Token,
@@ -26,7 +26,7 @@ pub struct Node {
     rhs: Option<Box<Node>>,
 }
 
-// Some<Box<...>>でくるんで返す
+/// Some<Box<...>>でくるんで返す
 fn new_node(kind: Token, lhs: Option<Box<Node>>, rhs: Option<Box<Node>>) -> Option<Box<Node>> {
     let node = Some(Box::new(Node {
         kind: kind,
@@ -36,7 +36,7 @@ fn new_node(kind: Token, lhs: Option<Box<Node>>, rhs: Option<Box<Node>>) -> Opti
     return node;
 }
 
-// 数字の節
+/// 数字の節
 fn new_node_num(val: Num) -> Option<Box<Node>> {
     let node = Node {
         kind: Token::Num(val),
@@ -53,7 +53,7 @@ pub struct TokenIter<'a> {
 }
 
 impl TokenIter<'_> {
-    // primaryに対応する構文木を返す
+    /// primaryに対応する構文木を返す
     fn primary(&mut self) -> Option<Box<Node>> {
         let st = self.next();
         let node: Option<Box<Node>>;
@@ -78,7 +78,7 @@ impl TokenIter<'_> {
             }
         }
     }
-
+    /// 式に相当する節
     pub fn expr(&mut self) -> Option<Box<Node>> {
         let mut node = self.mul();
         loop {
@@ -99,7 +99,7 @@ impl TokenIter<'_> {
             }
         }
     }
-
+    /// 乗法、除法に対応する節
     fn mul(&mut self) -> Option<Box<Node>> {
         // primary { * primary}
         let mut node = self.primary();
@@ -139,6 +139,7 @@ impl Token {
 }
 
 impl TokenIter<'_> {
+    /// 次のトークンを読み取るが、文字列の変更はしない
     fn next_readonly(&self) -> Option<Token> {
         if self.s.is_empty() {
             return None;

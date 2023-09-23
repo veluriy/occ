@@ -19,7 +19,7 @@ fn _prev_main() {
         match token {
             Token::Plus => println!("  add rax, {}", number),
             Token::Minus => println!("  sub rax, {}", number),
-            _ => panic!("")
+            _ => panic!(""),
         };
     }
     // println!("  mov rax, {}", &args[1]);
@@ -35,5 +35,5 @@ fn tree() {
 
 fn main() {
     _prev_main();
-	//tree()
+    //tree()
 }
