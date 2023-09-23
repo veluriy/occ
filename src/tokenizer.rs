@@ -46,6 +46,33 @@ fn new_node_num(val: Num) -> Option<Box<Node>> {
     return Some(Box::new(node));
 }
 
+// 構文木からアセンブリを作成
+pub fn gen(node: &Node) {
+    if let Token::Num(n) = node.kind {
+        println!("  push {:?}", n);
+        return;
+    }
+    if let Some(b) = &node.lhs {
+        gen(&b);
+    }
+    if let Some(b) = &node.rhs {
+        gen(&b);
+    }
+    println!("  pop rdi");
+    println!("  pop rax");
+    match node.kind {
+        Token::Plus => println!("  add rax, rdi"),
+        Token::Minus => println!("  sub rax, rdi"),
+        Token::Mul => println!("  imul rax, rdi"),
+        Token::Div => {
+            println!("  cqo");
+            println!("  idiv rdi");
+        },
+        _ => {},
+    };
+    println!("  push rax");
+}
+
 /// トークンのイテレータを表す構造体
 #[derive(Debug)]
 pub struct TokenIter<'a> {
@@ -60,7 +87,6 @@ impl TokenIter<'_> {
         if (*st.as_ref().unwrap() == Token::Bra) {
             node = self.expr();
             let token = self.next();
-            println!("{:?}", self);
             if (token != Some(Token::Ket)) {
                 panic!("）が期待されますが、見つかりませんでした。")
             }
@@ -68,8 +94,6 @@ impl TokenIter<'_> {
         } else {
             match st {
                 Some(Token::Num(n)) => {
-                    println!("som: {:?}", self);
-
                     return new_node_num(n);
                 }
                 _ => {
@@ -144,7 +168,6 @@ impl TokenIter<'_> {
         if self.s.is_empty() {
             return None;
         }
-        println!("ddsa: {:?}", self.s);
 
         match self.s.as_bytes()[0] {
             b'+' => {
