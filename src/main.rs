@@ -2,20 +2,6 @@ use std::{env, process};
 pub mod tokenizer;
 use crate::tokenizer::{tokenize, Token};
 fn _prev_main() {
-    let args: Vec<String> = env::args().collect();
-    // println!("{:?}", args);
-    if args.len() != 2 {
-        eprintln!("引数の数が異なります");
-        process::exit(1);
-    }
-    println!(".intel_syntax noprefix");
-    println!(".globl main");
-    println!("main:");
-    println!("  mov rax, {}", &args[1]);
-    println!("  ret");
-}
-
-fn main(){
     println!(".intel_syntax noprefix");
     println!(".globl main");
     println!("main:");
@@ -38,4 +24,16 @@ fn main(){
     }
     // println!("  mov rax, {}", &args[1]);
     println!("  ret");
+}
+
+fn tree() {
+    let str = "3+1*2";
+    let mut iter = tokenize(&str);
+    let node = iter.expr();
+    println!("{:?}", node);
+}
+
+fn main() {
+    _prev_main();
+	//tree()
 }
