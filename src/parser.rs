@@ -1,4 +1,4 @@
-use crate::lex::{Token, TokenIter, split_digit, Num};
+use crate::lex::{split_digit, Num, Token, TokenIter};
 /// 構文木
 #[derive(Debug)]
 pub struct Node {
