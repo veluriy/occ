@@ -1,5 +1,5 @@
-use std::{env, process};
 use occ::generate_assembly;
+use std::{env, process};
 
 fn main() {
     let args: Vec<String> = env::args().collect();

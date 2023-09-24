@@ -1,33 +1,9 @@
+use crate::types::{tokenize, Num, Token, TokenIter};
+
 /// Cのstrtolと似た処理
 pub fn split_digit(s: &str) -> (&str, &str) {
     let first_non_num_idx = s.find(|c| !char::is_numeric(c)).unwrap_or(s.len());
     s.split_at(first_non_num_idx)
-}
-
-/// 使う数値型
-pub type Num = u8;
-
-#[derive(Debug, PartialEq)]
-pub enum Token {
-    Plus,  // "+"
-    Minus, // "-"
-    Mul,   // "*"
-    Div,   // "/"
-    Bra,   // "("
-    Ket,   // ")"
-    Num(Num),
-}
-
-/// トークンのイテレータを表す構造体
-#[derive(Debug)]
-pub struct TokenIter<'a> {
-    pub s: &'a str,
-}
-
-/// 文字列を受け取って、トークンのイテレータを返す関数。つまりトークナイザー。
-/// Rustのイテレータは遅延評価なのでここでは何もしていない。
-pub fn tokenize<'a>(s: &'a str) -> TokenIter<'a> {
-    TokenIter { s }
 }
 
 impl Token {

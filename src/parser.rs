@@ -1,23 +1,10 @@
-use crate::lex::{split_digit, Num, Token, TokenIter};
-/// 構文木
-#[derive(Debug)]
-pub struct Node {
-    kind: Token,
-    lhs: Option<Box<Node>>,
-    rhs: Option<Box<Node>>,
-}
-
-#[derive(Debug)]
-pub struct Parser<'a> {
-    pub tokenizer: &'a mut TokenIter<'a>,
-}
+use crate::lex::split_digit;
+use crate::types::{Node, Num, Parser, Token};
 
 impl Parser<'_> {
-    pub fn parse(&mut self) {
-        let node = self.expr();
-        if let Some(b) = node {
-            generate_assembly_by_node(&b);
-        }
+    /// 構文木を作る処理
+    pub fn parse(&mut self) -> Option<Box<Node>> {
+        return self.expr();
     }
     fn primary(&mut self) -> Option<Box<Node>> {
         let st = self.tokenizer.next();
@@ -84,7 +71,7 @@ impl Parser<'_> {
         }
     }
     /// 次のトークンを読み取るが、文字列の変更はしない
-    fn next_readonly(&self) -> Option<Token> {
+    pub fn next_readonly(&self) -> Option<Token> {
         if self.tokenizer.s.is_empty() {
             return None;
         }
@@ -118,6 +105,7 @@ impl Parser<'_> {
     }
 }
 
+/// 構文木を作るための補助的な関数
 /// Some<Box<...>>でくるんで返す
 fn new_node(kind: Token, lhs: Option<Box<Node>>, rhs: Option<Box<Node>>) -> Option<Box<Node>> {
     let node = Some(Box::new(Node {
@@ -128,7 +116,7 @@ fn new_node(kind: Token, lhs: Option<Box<Node>>, rhs: Option<Box<Node>>) -> Opti
     return node;
 }
 
-/// 数字に対応した節
+/// 数字に対応した節を作る
 fn new_node_num(val: Num) -> Option<Box<Node>> {
     let node = Node {
         kind: Token::Num(val),
@@ -136,31 +124,4 @@ fn new_node_num(val: Num) -> Option<Box<Node>> {
         rhs: None,
     };
     return Some(Box::new(node));
-}
-
-/// 構文木からアセンブリコードを再帰的に作る
-pub fn generate_assembly_by_node(node: &Node) {
-    if let Token::Num(n) = node.kind {
-        println!("  push {:?}", n);
-        return;
-    }
-    if let Some(b) = &node.lhs {
-        generate_assembly_by_node(&b);
-    }
-    if let Some(b) = &node.rhs {
-        generate_assembly_by_node(&b);
-    }
-    println!("  pop rdi");
-    println!("  pop rax");
-    match node.kind {
-        Token::Plus => println!("  add rax, rdi"),
-        Token::Minus => println!("  sub rax, rdi"),
-        Token::Mul => println!("  imul rax, rdi"),
-        Token::Div => {
-            println!("  cqo");
-            println!("  idiv rdi");
-        }
-        _ => {}
-    };
-    println!("  push rax");
 }
