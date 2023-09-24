@@ -7,7 +7,6 @@ fn tree() {
     println!(".intel_syntax noprefix");
     println!(".globl main");
     println!("main:");
-    println!("  mov rax, {}", 0);
     let args: Vec<String> = env::args().collect();
     if args.len() != 2 {
         eprintln!("引数の数が異なります");
