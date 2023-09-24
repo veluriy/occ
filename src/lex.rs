@@ -1,4 +1,4 @@
-use crate::types::{tokenize, Num, Token, TokenIter};
+use crate::types::{Num, Token, TokenIter};
 
 /// Cのstrtolと似た処理
 pub fn split_digit(s: &str) -> (&str, &str) {
