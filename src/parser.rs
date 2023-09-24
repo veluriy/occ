@@ -41,7 +41,7 @@ impl Parser<'_> {
         }
     }
     /// 式に相当する節
-    pub fn expr(&mut self) -> Option<Box<Node>> {
+    fn expr(&mut self) -> Option<Box<Node>> {
         let mut node = self.mul();
         loop {
             // !
