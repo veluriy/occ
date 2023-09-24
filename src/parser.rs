@@ -14,7 +14,7 @@ pub struct Parser<'a> {
 
 impl Parser<'_> {
     pub fn parse(&mut self) {
-        let mut node = self.expr();
+        let node = self.expr();
         if let Some(b) = node {
             generate_assembly_by_node(&b);
         }
