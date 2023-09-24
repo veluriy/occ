@@ -1,6 +1,6 @@
 use std::{env, process};
-pub mod tokenizer;
-use crate::tokenizer::{tokenize, Token};
+pub mod parser;
+use crate::parser::{tokenize, Token};
 
 // 構文木を利用して四則演算を行う
 fn tree() {
@@ -17,7 +17,7 @@ fn tree() {
     let node = iter.expr();
     // パターンに拘束してtokenize
     if let Some(b) = node {
-        tokenizer::gen(&b);
+        parser::gen(&b);
     }
     println!("  pop rax");
     println!("  ret");
