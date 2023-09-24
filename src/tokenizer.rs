@@ -3,7 +3,7 @@ fn split_digit(s: &str) -> (&str, &str) {
     s.split_at(first_non_num_idx)
 }
 
-// 使う数値型
+/// 使う数値型
 type Num = u8;
 
 #[derive(Debug, PartialEq)]
@@ -45,7 +45,7 @@ fn new_node_num(val: Num) -> Option<Box<Node>> {
     return Some(Box::new(node));
 }
 
-// 構文木からアセンブリを作成
+/// 構文木から再帰的にアセンブリを作成
 pub fn gen(node: &Node) {
     if let Token::Num(n) = node.kind {
         println!("  push {:?}", n);
