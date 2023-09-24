@@ -14,8 +14,10 @@ pub fn generate_assembly(str: &str) {
     let mut parser = Parser {
         tokenizer: &mut iter,
     };
-    // parser.parse();
-    generate_assembly_by_parser(parser);
+    let node = parser.parse();
+    if let Some(b) = node {
+        print_assembly_by_node(&b);
+    }
     println!("  pop rax");
     println!("  ret");
 }

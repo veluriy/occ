@@ -1,15 +1,7 @@
-use crate::types::{Node, Parser, Token};
-
-/// パーサーを使ってアセンブリを作る
-pub fn generate_assembly_by_parser(mut parser: Parser) {
-    let node = parser.parse();
-    if let Some(b) = node {
-        print_assembly_by_node(&b);
-    }
-}
+use crate::types::{Node, Token};
 
 /// 構文木からアセンブリコードを再帰的に作る
-fn print_assembly_by_node(node: &Node) {
+pub fn print_assembly_by_node(node: &Node) {
     if let Token::Num(n) = node.kind {
         println!("  push {:?}", n);
         return;
