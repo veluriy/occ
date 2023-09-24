@@ -8,11 +8,9 @@ pub struct Node {
 }
 
 #[derive(Debug)]
-
 pub struct Parser<'a> {
     pub tokenizer: &'a mut TokenIter<'a>,
 }
-// コンストラクタ -> gen
 
 impl Parser<'_> {
     pub fn parse(&mut self) {
