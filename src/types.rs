@@ -34,8 +34,8 @@ pub fn tokenize<'a>(s: &'a str) -> TokenIter<'a> {
 }
 
 /// パーサー
-/// トークナイザを持つ
+/// イテレータを持つ
 #[derive(Debug)]
 pub struct Parser<'a> {
-    pub tokenizer: &'a mut TokenIter<'a>,
+    pub tokenIter: &'a mut TokenIter<'a>,
 }
