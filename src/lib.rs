@@ -12,7 +12,7 @@ pub fn generate_assembly(str: &str) {
     println!("main:");
     let mut iter = tokenize(str);
     let mut parser = Parser {
-        tokenIter: &mut iter,
+        token_iter: &mut iter,
     };
     let node = parser.parse();
     if let Some(b) = node {

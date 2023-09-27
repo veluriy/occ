@@ -7,11 +7,11 @@ impl Parser<'_> {
         return self.expr();
     }
     fn primary(&mut self) -> Option<Box<Node>> {
-        let st = self.tokenIter.next();
+        let st = self.token_iter.next();
         let node: Option<Box<Node>>;
         if (*st.as_ref().unwrap() == Token::Bra) {
             node = self.expr();
-            let token = self.tokenIter.next();
+            let token = self.token_iter.next();
             if (token != Some(Token::Ket)) {
                 panic!("）が期待されますが、見つかりませんでした。")
             }
@@ -37,11 +37,11 @@ impl Parser<'_> {
                 return node;
             }
             if (*token.as_ref().unwrap() == Token::Plus) {
-                self.tokenIter.next();
+                self.token_iter.next();
                 // println!("plus:{:?}", self);
                 node = new_node(Token::Plus, node, self.mul());
             } else if (token.unwrap() == Token::Minus) {
-                self.tokenIter.next();
+                self.token_iter.next();
                 // println!("minus:{:?}", self);
                 node = new_node(Token::Minus, node, self.mul());
             } else {
@@ -57,11 +57,11 @@ impl Parser<'_> {
             let next = self.next_readonly();
             match next {
                 Some(Token::Mul) => {
-                    self.tokenIter.next();
+                    self.token_iter.next();
                     node = new_node(Token::Mul, node, self.primary())
                 }
                 Some(Token::Div) => {
-                    self.tokenIter.next();
+                    self.token_iter.next();
                     node = new_node(Token::Div, node, self.primary())
                 }
                 _ => {
@@ -72,10 +72,10 @@ impl Parser<'_> {
     }
     /// 次のトークンを読み取るが、文字列の変更はしない
     pub fn next_readonly(&self) -> Option<Token> {
-        if self.tokenIter.s.is_empty() {
+        if self.token_iter.s.is_empty() {
             return None;
         }
-        match self.tokenIter.s.as_bytes()[0] {
+        match self.token_iter.s.as_bytes()[0] {
             b'+' => {
                 return Some(Token::Plus);
             }
@@ -97,7 +97,7 @@ impl Parser<'_> {
             _ => {}
         }
 
-        let (digit_s, remain_s) = split_digit(self.tokenIter.s);
+        let (digit_s, _remain_s) = split_digit(self.token_iter.s);
         if !digit_s.is_empty() {
             return Some(Token::Num(Num::from_str_radix(digit_s, 10).unwrap()));
         }
