@@ -29,7 +29,7 @@ pub struct TokenIter<'a> {
 
 /// 文字列を受け取って、トークンのイテレータを返す関数。つまりトークナイザー。
 /// Rustのイテレータは遅延評価なのでここでは何もしていない。
-pub fn tokenize<'a>(s: &'a str) -> TokenIter<'a> {
+pub fn tokenize(s: &str) -> TokenIter<'_> {
     TokenIter { s }
 }
 
