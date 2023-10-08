@@ -9,10 +9,10 @@ impl Parser<'_> {
     fn primary(&mut self) -> Option<Box<Node>> {
         let st = self.token_iter.next();
         let node: Option<Box<Node>>;
-        if (*st.as_ref().unwrap() == Token::Bra) {
+        if *st.as_ref().unwrap() == Token::Bra {
             node = self.expr();
             let token = self.token_iter.next();
-            if (token != Some(Token::Ket)) {
+            if token != Some(Token::Ket) {
                 panic!("）が期待されますが、見つかりませんでした。")
             }
             return node;
@@ -36,11 +36,11 @@ impl Parser<'_> {
             if token == None {
                 return node;
             }
-            if (*token.as_ref().unwrap() == Token::Plus) {
+            if *token.as_ref().unwrap() == Token::Plus {
                 self.token_iter.next();
                 // println!("plus:{:?}", self);
                 node = new_node(Token::Plus, node, self.mul());
-            } else if (token.unwrap() == Token::Minus) {
+            } else if token.unwrap() == Token::Minus {
                 self.token_iter.next();
                 // println!("minus:{:?}", self);
                 node = new_node(Token::Minus, node, self.mul());
@@ -108,11 +108,7 @@ impl Parser<'_> {
 /// 構文木を作るための補助的な関数
 /// Some<Box<...>>でくるんで返す
 fn new_node(kind: Token, lhs: Option<Box<Node>>, rhs: Option<Box<Node>>) -> Option<Box<Node>> {
-    let node = Some(Box::new(Node {
-        kind: kind,
-        lhs: lhs,
-        rhs: rhs,
-    }));
+    let node = Some(Box::new(Node { kind, lhs, rhs }));
     return node;
 }
 
