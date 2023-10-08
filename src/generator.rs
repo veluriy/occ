@@ -7,10 +7,10 @@ pub fn print_assembly_by_node(node: &Node) {
         return;
     }
     if let Some(b) = &node.lhs {
-        print_assembly_by_node(&b);
+        print_assembly_by_node(b);
     }
     if let Some(b) = &node.rhs {
-        print_assembly_by_node(&b);
+        print_assembly_by_node(b);
     }
     println!("  pop rdi");
     println!("  pop rax");

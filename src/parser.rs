@@ -4,7 +4,7 @@ use crate::types::{Node, Num, Parser, Token};
 impl Parser<'_> {
     /// 構文木を作る処理
     pub fn parse(&mut self) -> Option<Box<Node>> {
-        return self.expr();
+        self.expr()
     }
     fn primary(&mut self) -> Option<Box<Node>> {
         let st = self.token_iter.next();
@@ -15,11 +15,11 @@ impl Parser<'_> {
             if token != Some(Token::Ket) {
                 panic!("）が期待されますが、見つかりませんでした。")
             }
-            return node;
+            node
         } else {
             match st {
                 Some(Token::Num(n)) => {
-                    return new_node_num(n);
+                    new_node_num(n)
                 }
                 _ => {
                     panic!("{:?}", self);
@@ -33,7 +33,7 @@ impl Parser<'_> {
         loop {
             // !
             let token = self.next_readonly();
-            if token == None {
+            if token.is_none() {
                 return node;
             }
             if *token.as_ref().unwrap() == Token::Plus {
@@ -108,8 +108,8 @@ impl Parser<'_> {
 /// 構文木を作るための補助的な関数
 /// Some<Box<...>>でくるんで返す
 fn new_node(kind: Token, lhs: Option<Box<Node>>, rhs: Option<Box<Node>>) -> Option<Box<Node>> {
-    let node = Some(Box::new(Node { kind, lhs, rhs }));
-    return node;
+    
+    Some(Box::new(Node { kind, lhs, rhs }))
 }
 
 /// 数字に対応した節を作る
@@ -119,5 +119,5 @@ fn new_node_num(val: Num) -> Option<Box<Node>> {
         lhs: None,
         rhs: None,
     };
-    return Some(Box::new(node));
+    Some(Box::new(node))
 }
