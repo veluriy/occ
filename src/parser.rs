@@ -1,5 +1,5 @@
 use crate::lex::split_digit;
-use crate::types::{Node, Num, Parser, Token, TokenIter};
+use crate::types::{Node, Num, Parser, Token};
 
 impl Parser<'_> {
     /// 構文木を作る処理
@@ -62,7 +62,7 @@ impl Parser<'_> {
         if self.token_iter.consume("-") {
             return new_node(Token::Minus, new_node_num(0), self.primary());
         }
-        return self.primary();
+        self.primary()
     }
 
 

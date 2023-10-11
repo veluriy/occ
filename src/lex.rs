@@ -18,9 +18,9 @@ impl Token {
 
 impl TokenIter<'_> {
     pub fn consume(&mut self, s: &str) -> bool {
-        return self.s.starts_with(s).then(|| {
+        self.s.starts_with(s).then(|| {
             self.next();
-        }).is_some();
+        }).is_some()
     }
 }
 
