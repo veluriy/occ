@@ -13,16 +13,16 @@ impl Parser<'_> {
             node = self.expr();
             let token = self.token_iter.next();
             if token != Some(Token::Ket) {
-                panic!("）が期待されますが、見つかりませんでした。")
+                panic!("')' expected, but found {:?}", token)
             }
             node
         } else {
             match st {
                 Some(Token::Num(n)) => {
                     new_node_num(n)
-                }
+                },
                 _ => {
-                    panic!("{:?}", self);
+                    panic!("{:?}, {:?}", self, st);
                 }
             }
         }
@@ -31,18 +31,9 @@ impl Parser<'_> {
     fn expr(&mut self) -> Option<Box<Node>> {
         let mut node = self.mul();
         loop {
-            // !
-            let token = self.next_readonly();
-            if token.is_none() {
-                return node;
-            }
-            if *token.as_ref().unwrap() == Token::Plus {
-                self.token_iter.next();
-                // println!("plus:{:?}", self);
+            if self.token_iter.consume("+") {
                 node = new_node(Token::Plus, node, self.mul());
-            } else if token.unwrap() == Token::Minus {
-                self.token_iter.next();
-                // println!("minus:{:?}", self);
+            } else if self.token_iter.consume("-") {
                 node = new_node(Token::Minus, node, self.mul());
             } else {
                 return node;
@@ -52,24 +43,29 @@ impl Parser<'_> {
     /// 乗法、除法に対応する節
     fn mul(&mut self) -> Option<Box<Node>> {
         // primary { * primary}
-        let mut node = self.primary();
+        let mut node = self.unary();
         loop {
-            let next = self.next_readonly();
-            match next {
-                Some(Token::Mul) => {
-                    self.token_iter.next();
-                    node = new_node(Token::Mul, node, self.primary())
-                }
-                Some(Token::Div) => {
-                    self.token_iter.next();
-                    node = new_node(Token::Div, node, self.primary())
-                }
-                _ => {
-                    return node;
-                }
-            }
+            if self.token_iter.consume("*") {
+                node = new_node(Token::Mul, node, self.unary());
+            } else if self.token_iter.consume("/") {
+                node = new_node(Token::Div, node, self.unary());
+            } else {
+                return node;
+            };
         }
     }
+
+    fn unary(&mut self) -> Option<Box<Node>> {
+        if self.token_iter.consume("+") {
+            return self.primary();
+        }
+        if self.token_iter.consume("-") {
+            return new_node(Token::Minus, new_node_num(0), self.primary());
+        }
+        self.primary()
+    }
+
+
     /// 次のトークンを読み取るが、文字列の変更はしない
     pub fn next_readonly(&self) -> Option<Token> {
         if self.token_iter.s.is_empty() {

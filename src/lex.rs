@@ -16,6 +16,14 @@ impl Token {
     }
 }
 
+impl TokenIter<'_> {
+    pub fn consume(&mut self, s: &str) -> bool {
+        self.s.starts_with(s).then(|| {
+            self.next();
+        }).is_some()
+    }
+}
+
 /// トークナイザーの中身。
 /// やっていることは、次のトークンの判定を行い、内部の文字列を更新するだけ。
 impl<'a> Iterator for TokenIter<'a> {
