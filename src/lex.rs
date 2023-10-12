@@ -75,3 +75,17 @@ impl<'a> Iterator for TokenIter<'a> {
         panic!("");
     }
 }
+
+
+#[cfg(test)]
+mod test {
+    use crate::types::tokenize;
+    #[test]
+    fn test_lex() {
+        let mut iter = tokenize("3 + 4 + 5");
+        iter.next();
+        assert_eq!(" + 4 + 5", iter.s);
+        iter.next();
+        assert_eq!(" 4 + 5", iter.s);
+    }
+}
