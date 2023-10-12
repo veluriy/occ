@@ -17,6 +17,7 @@ impl Token {
 }
 
 impl TokenIter<'_> {
+    /// self.sがsに一致した場合のみトークンを進める
     pub fn consume(&mut self, s: &str) -> bool {
         self.s.starts_with(s).then(|| {
             self.next();
@@ -34,6 +35,8 @@ impl<'a> Iterator for TokenIter<'a> {
         if self.s.is_empty() {
             return None;
         }
+        // 空白が出てこなくなるまで一文字進める
+        while self.consume(" ") {}
 
         match self.s.as_bytes()[0] {
             b'+' => {
