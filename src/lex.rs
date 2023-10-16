@@ -36,7 +36,7 @@ impl<'a> Iterator for TokenIter<'a> {
         }
 
         // > と =>のような部分列の関係にある文字列に注意
-        let mut operands = vec!["+", "-", "*", "/", "(", ")", "<=", "=>", ">", "<", "=="];
+        let operands = vec!["+", "-", "*", "/", "(", ")", "<=", "=>", ">", "<", "=="];
         // operands.sort_by_key(f)
         for op in operands {
         if self.s.starts_with(op){

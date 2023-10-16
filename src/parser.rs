@@ -33,7 +33,7 @@ impl<'a> Parser<'a> {
   }
 
   fn equality(&mut self) -> Option<Box<Node<'a>>> {
-    let mut node = self.relational();
+    let node = self.relational();
     if self.token_iter.consume("==") {
       return new_node(Token::Operand("=="), node, self.relational());
     } else if self.token_iter.consume("!=") {
@@ -110,7 +110,7 @@ impl<'a> Parser<'a> {
       return None;
     }
     // > と =>のような部分列の関係にある文字列に注意
-    let mut operands = vec!["+", "-", "*", "/", "(", ")", "<=", "=>", ">", "<", "=="];
+    let operands = vec!["+", "-", "*", "/", "(", ")", "<=", "=>", ">", "<", "=="];
     // operands.sort_by_key(f)
     for op in operands {
       if self.token_iter.s.starts_with(op){ return Some(Token::Operand(op)); }
