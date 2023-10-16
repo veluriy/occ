@@ -1,5 +1,5 @@
 /// 構文木
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct Node<'a> {
   pub kind: Token<'a>,
   pub lhs: Option<Box<Node<'a>>>,

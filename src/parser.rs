@@ -27,16 +27,40 @@ impl<'a> Parser<'a> {
   }
   /// 式に相当する節
   fn expr(&mut self) -> Option<Box<Node<'a>>> {
+    return self.equality();
+  }
+
+  fn equality(&mut self) -> Option<Box<Node<'a>>> {
+    let mut node = self.relational();
+    if self.token_iter.consume("==") {
+      return new_node(Token::Operand("=="), node, self.relational());
+    } else if self.token_iter.consume("!=") {
+      return new_node(Token::Operand("!="), node, self.relational());
+    } else {
+      return node;
+    }
+  }
+
+  fn add(&mut self) -> Option<Box<Node<'a>>> {
+    let operands = vec!["+", "-"];
     let mut node = self.mul();
-    loop {
-      if self.token_iter.consume("+") {
-        node = new_node(Token::Operand("+"), node, self.mul());
-      } else if self.token_iter.consume("-") {
-        node = new_node(Token::Operand("-"), node, self.mul());
-      } else {
-        return node;
+    for op in operands {
+      if self.token_iter.consume(op) {
+        return new_node(Token::Operand(op), node, self.mul());
       }
     }
+    return node;
+  }
+
+  fn relational(&mut self) -> Option<Box<Node<'a>>> {
+    let operands = vec!["<", "<=", ">", ">="];
+    let mut node = self.add();
+    for op in operands {
+      if self.token_iter.consume(op) {
+        return new_node(Token::Operand(op), node, self.add());
+      }
+    }
+    return node;
   }
   /// 乗法、除法に対応する節
   fn mul(&mut self) -> Option<Box<Node<'a>>> {
@@ -116,4 +140,33 @@ fn new_node_num<'a>(val: Num) -> Option<Box<Node<'a>>> {
     rhs: None,
   };
   Some(Box::new(node))
+}
+
+#[cfg(test)]
+mod test {
+  use crate::{
+    parser::new_node_num,
+    types::{Node, Parser, Token, TokenIter},
+  };
+
+  #[test]
+  fn test_parser() {
+    let mut iter = TokenIter { s: "1 < 2 + 3" };
+    let mut parser = Parser {
+      token_iter: &mut iter,
+    };
+
+    assert_eq!(
+      *(parser.parse().unwrap()),
+      Node {
+        kind: Token::Operand("<"),
+        lhs: new_node_num(1),
+        rhs: Some(Box::new(Node {
+          kind: Token::Operand("+"),
+          lhs: new_node_num(2),
+          rhs: new_node_num(3)
+        }))
+      }
+    )
+  }
 }
