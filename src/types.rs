@@ -1,9 +1,9 @@
 /// 構文木
 #[derive(Debug)]
-pub struct Node {
-    pub kind: Token,
-    pub lhs: Option<Box<Node>>,
-    pub rhs: Option<Box<Node>>,
+pub struct Node<'a> {
+    pub kind: Token<'a>,
+    pub lhs: Option<Box<Node<'a>>>,
+    pub rhs: Option<Box<Node<'a>>>,
 }
 
 /// 使う数値型
@@ -11,14 +11,16 @@ pub type Num = u8;
 
 /// トークン
 #[derive(Debug, PartialEq)]
-pub enum Token {
+pub enum Token<'a> {
     Plus,  // "+"
     Minus, // "-"
     Mul,   // "*"
     Div,   // "/"
     Bra,   // "("
     Ket,   // ")"
+    Operand(&'a str),
     Num(Num),
+    LVar(&'a str),
 }
 
 /// トークンのイテレータを表す構造体

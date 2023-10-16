@@ -6,7 +6,7 @@ pub fn split_digit(s: &str) -> (&str, &str) {
     s.split_at(first_non_num_idx)
 }
 
-impl Token {
+impl Token<'_> {
     /// あとで使う便利関数。
     pub fn expect_num(&self) -> Num {
         match self {
@@ -27,7 +27,7 @@ impl TokenIter<'_> {
 /// トークナイザーの中身。
 /// やっていることは、次のトークンの判定を行い、内部の文字列を更新するだけ。
 impl<'a> Iterator for TokenIter<'a> {
-    type Item = Token;
+    type Item = Token<'a>;
 
     fn next(&mut self) -> Option<Self::Item> {
         self.s = self.s.trim_start();
