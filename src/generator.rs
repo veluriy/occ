@@ -15,12 +15,32 @@ pub fn print_assembly_by_node(node: &Node) {
     println!("  pop rdi");
     println!("  pop rax");
     match node.kind {
-        Token::Plus => println!("  add rax, rdi"),
-        Token::Minus => println!("  sub rax, rdi"),
-        Token::Mul => println!("  imul rax, rdi"),
-        Token::Div => {
+        Token::Operand("+") => println!("  add rax, rdi"),
+        Token::Operand("-") => println!("  sub rax, rdi"),
+        Token::Operand("*") => println!("  imul rax, rdi"),
+        Token::Operand("/") => {
             println!("  cqo");
             println!("  idiv rdi");
+        }
+        Token::Operand("==") => {
+            println!("cmp rax, rdi");
+            println!("sete al");
+            println!("movzb rax, al");
+        }
+        Token::Operand("<") => {
+            println!("cmp rax, rdi");
+            println!("setl al");
+            println!("movzb rax, al");
+        }
+        Token::Operand("<=") => {
+            println!("cmp rax, rdi");
+            println!("setle al");
+            println!("movzb rax, al");
+        }
+        Token::Operand("!=") => {
+            println!("cmp rax, rdi");
+            println!("setne al");
+            println!("movzb rax, al");
         }
         _ => {}
     };
