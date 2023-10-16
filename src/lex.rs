@@ -18,9 +18,12 @@ impl Token<'_> {
 
 impl TokenIter<'_> {
     pub fn consume(&mut self, s: &str) -> bool {
-        self.s.starts_with(s).then(|| {
-            self.s = &self.s[s.len()..];
-        }).is_some()
+        self.s
+            .starts_with(s)
+            .then(|| {
+                self.s = &self.s[s.len()..];
+            })
+            .is_some()
     }
 }
 
@@ -39,10 +42,10 @@ impl<'a> Iterator for TokenIter<'a> {
         let operands = vec!["+", "-", "*", "/", "(", ")", "<=", "=>", ">", "<", "=="];
         // operands.sort_by_key(f)
         for op in operands {
-        if self.s.starts_with(op){
-            self.consume(op);
-            return Some(Token::Operand(op));
-        }
+            if self.s.starts_with(op) {
+                self.consume(op);
+                return Some(Token::Operand(op));
+            }
         }
 
         let (digit_s, remain_s) = split_digit(self.s);
@@ -61,7 +64,7 @@ mod test {
 
     #[test]
     fn test() {
-        let mut iter = TokenIter{s: "3+4"};
+        let mut iter = TokenIter { s: "3+4" };
         iter.next();
         assert_eq!("+4", iter.s);
         iter.next();
