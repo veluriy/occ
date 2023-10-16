@@ -21,7 +21,27 @@ pub fn print_assembly_by_node(node: &Node) {
         Token::Operand("/") => {
             println!("  cqo");
             println!("  idiv rdi");
-        }
+        },
+        Token::Operand("==") => {
+            println!("cmp rax, rdi");
+            println!("sete al");
+            println!("movzb rax, al");
+        },
+        Token::Operand("<") => {
+            println!("cmp rax, rdi");
+            println!("setl al");
+            println!("movzb rax, al");
+        },
+        Token::Operand("<=") => {
+            println!("cmp rax, rdi");
+            println!("setle al");
+            println!("movzb rax, al");
+        },
+        Token::Operand("!=") => {
+            println!("cmp rax, rdi");
+            println!("setne al");
+            println!("movzb rax, al");
+        },
         _ => {}
     };
     println!("  push rax");

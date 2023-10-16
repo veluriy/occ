@@ -10,12 +10,12 @@ impl<'a> Parser<'a> {
     // 最初の数字をとっている想定
     let st = self.token_iter.next();
     let node: Option<Box<Node>>;
-    println!("{:?}",st);
+    // println!("{:?}",st);
     if *st.as_ref().unwrap() == Token::Operand("(") {
       node = self.expr();
       let token = self.token_iter.next();
       if token != Some(Token::Operand(")")) {
-        panic!("')' expected, but found {:?}", token)
+        panic!("')' expected, but found {:?}, self: {:?}", token, self)
       }
       node
     } else {
@@ -45,12 +45,12 @@ impl<'a> Parser<'a> {
 
   fn add(&mut self) -> Option<Box<Node<'a>>> {
     let mut node = self.mul();
-    loop {
+    'outer: loop {
       let operands = vec!["+", "-"].into_iter();
       for op in operands {
         if self.token_iter.consume(op) {
           node = new_node(Token::Operand(op), node, self.mul());
-          continue;
+          continue 'outer;
         }
       }
       return node;
@@ -59,14 +59,23 @@ impl<'a> Parser<'a> {
 
   fn relational(&mut self) -> Option<Box<Node<'a>>> {
     let mut node = self.add();
-    loop {
-      let operands = vec!["<=", "<", "=>", ">"].into_iter();
-      for op in operands {
-        if self.token_iter.consume(op) {
-          node = new_node(Token::Operand(op), node, self.add());
-          continue;
+    'outer: loop {
+      // そのまま構文木に入れる
+        if self.token_iter.consume("<=") {
+          node = new_node(Token::Operand("<="), node, self.add());
+          continue 'outer;
+        } else if self.token_iter.consume("<") {
+          node = new_node(Token::Operand("<"), node, self.add());
+          continue 'outer;
         }
-      }
+        // 左右を反転させて対応した演算を指定し、構文木に入れる（例: "3>4"-> "4<3"）
+         else if self.token_iter.consume("=>") {
+          node = new_node(Token::Operand("<="), self.add(),node);
+          continue 'outer;
+        } else if self.token_iter.consume(">") {
+          node = new_node(Token::Operand("<"), self.add(), node);
+          continue 'outer;
+        }
       return node;
     }
   }
