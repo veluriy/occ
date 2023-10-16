@@ -19,7 +19,7 @@ impl Token<'_> {
 impl TokenIter<'_> {
     pub fn consume(&mut self, s: &str) -> bool {
         self.s.starts_with(s).then(|| {
-            self.next();
+            self.s = &self.s[s.len()..];
         }).is_some()
     }
 }
@@ -35,32 +35,14 @@ impl<'a> Iterator for TokenIter<'a> {
             return None;
         }
 
-        match self.s.as_bytes()[0] {
-            b'+' => {
-                self.s = self.s.split_at(1).1;
-                return Some(Token::Operand("+"));
-            }
-            b'-' => {
-                self.s = self.s.split_at(1).1;
-                return Some(Token::Operand("-"));
-            }
-            b'*' => {
-                self.s = self.s.split_at(1).1;
-                return Some(Token::Operand("*"));
-            }
-            b'/' => {
-                self.s = self.s.split_at(1).1;
-                return Some(Token::Operand("/"));
-            }
-            b'(' => {
-                self.s = self.s.split_at(1).1;
-                return Some(Token::Operand("("));
-            }
-            b')' => {
-                self.s = self.s.split_at(1).1;
-                return Some(Token::Operand(")"));
-            }
-            _ => {}
+        // > と =>のような部分列の関係にある文字列に注意
+        let mut operands = vec!["+", "-", "*", "/", "(", ")", "<=", "=>", ">", "<", "=="];
+        // operands.sort_by_key(f)
+        for op in operands {
+        if self.s.starts_with(op){
+            self.consume(op);
+            return Some(Token::Operand(op));
+        }
         }
 
         let (digit_s, remain_s) = split_digit(self.s);
@@ -70,5 +52,19 @@ impl<'a> Iterator for TokenIter<'a> {
         }
         eprintln!("s:{:?}", remain_s);
         panic!("");
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use crate::types::TokenIter;
+
+    #[test]
+    fn test() {
+        let mut iter = TokenIter{s: "3+4"};
+        iter.next();
+        assert_eq!("+4", iter.s);
+        iter.next();
+        assert_eq!("4", iter.s);
     }
 }

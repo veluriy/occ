@@ -7,8 +7,10 @@ impl<'a> Parser<'a> {
     self.expr()
   }
   fn primary(&mut self) -> Option<Box<Node<'a>>> {
+    // 最初の数字をとっている想定
     let st = self.token_iter.next();
     let node: Option<Box<Node>>;
+    println!("{:?}",st);
     if *st.as_ref().unwrap() == Token::Operand("(") {
       node = self.expr();
       let token = self.token_iter.next();
@@ -42,25 +44,31 @@ impl<'a> Parser<'a> {
   }
 
   fn add(&mut self) -> Option<Box<Node<'a>>> {
-    let operands = vec!["+", "-"];
     let mut node = self.mul();
-    for op in operands {
-      if self.token_iter.consume(op) {
-        return new_node(Token::Operand(op), node, self.mul());
+    loop {
+      let operands = vec!["+", "-"].into_iter();
+      for op in operands {
+        if self.token_iter.consume(op) {
+          node = new_node(Token::Operand(op), node, self.mul());
+          continue;
+        }
       }
+      return node;
     }
-    return node;
   }
 
   fn relational(&mut self) -> Option<Box<Node<'a>>> {
-    let operands = vec!["<", "<=", ">", ">="];
     let mut node = self.add();
-    for op in operands {
-      if self.token_iter.consume(op) {
-        return new_node(Token::Operand(op), node, self.add());
+    loop {
+      let operands = vec!["<=", "<", "=>", ">"].into_iter();
+      for op in operands {
+        if self.token_iter.consume(op) {
+          node = new_node(Token::Operand(op), node, self.add());
+          continue;
+        }
       }
+      return node;
     }
-    return node;
   }
   /// 乗法、除法に対応する節
   fn mul(&mut self) -> Option<Box<Node<'a>>> {
@@ -92,28 +100,12 @@ impl<'a> Parser<'a> {
     if self.token_iter.s.is_empty() {
       return None;
     }
-    match self.token_iter.s.as_bytes()[0] {
-      b'+' => {
-        return Some(Token::Operand("+"));
-      }
-      b'-' => {
-        return Some(Token::Operand("-"));
-      }
-      b'*' => {
-        return Some(Token::Operand("*"));
-      }
-      b'/' => {
-        return Some(Token::Operand("/"));
-      }
-      b'(' => {
-        return Some(Token::Operand("("));
-      }
-      b')' => {
-        return Some(Token::Operand(")"));
-      }
-      _ => {}
+    // > と =>のような部分列の関係にある文字列に注意
+    let mut operands = vec!["+", "-", "*", "/", "(", ")", "<=", "=>", ">", "<", "=="];
+    // operands.sort_by_key(f)
+    for op in operands {
+      if self.token_iter.s.starts_with(op){ return Some(Token::Operand(op)); }
     }
-
     let (digit_s, _remain_s) = split_digit(self.token_iter.s);
     if !digit_s.is_empty() {
       return Some(Token::Num(Num::from_str_radix(digit_s, 10).unwrap()));
@@ -151,7 +143,7 @@ mod test {
 
   #[test]
   fn test_parser() {
-    let mut iter = TokenIter { s: "1 < 2 + 3" };
+    let mut iter = TokenIter { s: "1<2+3" };
     let mut parser = Parser {
       token_iter: &mut iter,
     };
