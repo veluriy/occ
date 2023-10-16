@@ -9,10 +9,10 @@ impl<'a> Parser<'a> {
   fn primary(&mut self) -> Option<Box<Node<'a>>> {
     let st = self.token_iter.next();
     let node: Option<Box<Node>>;
-    if *st.as_ref().unwrap() == Token::Bra {
+    if *st.as_ref().unwrap() == Token::Operand("(") {
       node = self.expr();
       let token = self.token_iter.next();
-      if token != Some(Token::Ket) {
+      if token != Some(Token::Operand(")")) {
         panic!("')' expected, but found {:?}", token)
       }
       node
@@ -30,9 +30,9 @@ impl<'a> Parser<'a> {
     let mut node = self.mul();
     loop {
       if self.token_iter.consume("+") {
-        node = new_node(Token::Plus, node, self.mul());
+        node = new_node(Token::Operand("+"), node, self.mul());
       } else if self.token_iter.consume("-") {
-        node = new_node(Token::Minus, node, self.mul());
+        node = new_node(Token::Operand("-"), node, self.mul());
       } else {
         return node;
       }
@@ -44,9 +44,9 @@ impl<'a> Parser<'a> {
     let mut node = self.unary();
     loop {
       if self.token_iter.consume("*") {
-        node = new_node(Token::Mul, node, self.unary());
+        node = new_node(Token::Operand("*"), node, self.unary());
       } else if self.token_iter.consume("/") {
-        node = new_node(Token::Div, node, self.unary());
+        node = new_node(Token::Operand("/"), node, self.unary());
       } else {
         return node;
       };
@@ -58,7 +58,7 @@ impl<'a> Parser<'a> {
       return self.primary();
     }
     if self.token_iter.consume("-") {
-      return new_node(Token::Minus, new_node_num(0), self.primary());
+      return new_node(Token::Operand("-"), new_node_num(0), self.primary());
     }
     self.primary()
   }
@@ -70,22 +70,22 @@ impl<'a> Parser<'a> {
     }
     match self.token_iter.s.as_bytes()[0] {
       b'+' => {
-        return Some(Token::Plus);
+        return Some(Token::Operand("+"));
       }
       b'-' => {
-        return Some(Token::Minus);
+        return Some(Token::Operand("-"));
       }
       b'*' => {
-        return Some(Token::Mul);
+        return Some(Token::Operand("*"));
       }
       b'/' => {
-        return Some(Token::Div);
+        return Some(Token::Operand("/"));
       }
       b'(' => {
-        return Some(Token::Bra);
+        return Some(Token::Operand("("));
       }
       b')' => {
-        return Some(Token::Ket);
+        return Some(Token::Operand(")"));
       }
       _ => {}
     }

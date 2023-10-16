@@ -38,27 +38,27 @@ impl<'a> Iterator for TokenIter<'a> {
         match self.s.as_bytes()[0] {
             b'+' => {
                 self.s = self.s.split_at(1).1;
-                return Some(Token::Plus);
+                return Some(Token::Operand("+"));
             }
             b'-' => {
                 self.s = self.s.split_at(1).1;
-                return Some(Token::Minus);
+                return Some(Token::Operand("-"));
             }
             b'*' => {
                 self.s = self.s.split_at(1).1;
-                return Some(Token::Mul);
+                return Some(Token::Operand("*"));
             }
             b'/' => {
                 self.s = self.s.split_at(1).1;
-                return Some(Token::Div);
+                return Some(Token::Operand("/"));
             }
             b'(' => {
                 self.s = self.s.split_at(1).1;
-                return Some(Token::Bra);
+                return Some(Token::Operand("("));
             }
             b')' => {
                 self.s = self.s.split_at(1).1;
-                return Some(Token::Ket);
+                return Some(Token::Operand(")"));
             }
             _ => {}
         }

@@ -15,10 +15,10 @@ pub fn print_assembly_by_node(node: &Node) {
     println!("  pop rdi");
     println!("  pop rax");
     match node.kind {
-        Token::Plus => println!("  add rax, rdi"),
-        Token::Minus => println!("  sub rax, rdi"),
-        Token::Mul => println!("  imul rax, rdi"),
-        Token::Div => {
+        Token::Operand("+") => println!("  add rax, rdi"),
+        Token::Operand("-") => println!("  sub rax, rdi"),
+        Token::Operand("*") => println!("  imul rax, rdi"),
+        Token::Operand("/") => {
             println!("  cqo");
             println!("  idiv rdi");
         }
