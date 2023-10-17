@@ -15,6 +15,7 @@ pub enum Token<'a> {
     Operand(&'a str), // Plusなどの演算子をまとめる予定
     Num(Num),
     LVar(&'a str),
+    Ctrl(&'a str),
 }
 
 /// トークンのイテレータを表す構造体
