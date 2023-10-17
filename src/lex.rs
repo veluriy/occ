@@ -6,7 +6,8 @@ pub fn split_digit(s: &str) -> (&str, &str) {
     s.split_at(first_non_num_idx)
 }
 
-pub fn is_ctrl_sytx(s: &str) -> bool {
+/// 文字列に対応するトークンがreturnなどの予約語なのかを判別
+pub fn is_reserved_words(s: &str) -> bool {
     if s == "return" {return true;}
     return false;
 }
@@ -63,9 +64,9 @@ impl<'a> Iterator for TokenIter<'a> {
                 if let Some(idx) = first_non_alphabetic_idx {
                     let res = &self.s[..idx];
                     self.consume(res);
-                    if is_ctrl_sytx(&res) {
+                    if is_reserved_words(&res) {
                         // 
-                        return Some(Token::Ctrl(res));
+                        return Some(Token::Reserved(res));
                     }
                     return Some(Token::LVar(res));
                 }
@@ -73,8 +74,8 @@ impl<'a> Iterator for TokenIter<'a> {
                 else {
                     let res = self.s;
                     self.consume(res);
-                    if is_ctrl_sytx(&res) {
-                        return Some(Token::Ctrl(res));
+                    if is_reserved_words(&res) {
+                        return Some(Token::Reserved(res));
                     }
                     return Some(Token::LVar(res));
                 }
