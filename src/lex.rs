@@ -9,7 +9,7 @@ pub fn split_digit(s: &str) -> (&str, &str) {
 /// 文字列に対応するトークンがreturnなどの予約語なのかを判別
 pub fn is_reserved_words(s: &str) -> bool {
     if s == "return" {return true;}
-    return false;
+    false
 }
 
 impl Token<'_> {
@@ -44,7 +44,7 @@ impl<'a> Iterator for TokenIter<'a> {
         if self.s.is_empty() {
             return None;
         }
-
+        
         self.s = self.s.trim_start();
 
         // > と =>のような部分列の関係にある文字列に注意
@@ -65,7 +65,7 @@ impl<'a> Iterator for TokenIter<'a> {
                 if let Some(idx) = first_non_alphabetic_idx {
                     let res = &self.s[..idx];
                     self.consume(res);
-                    if is_reserved_words(&res) {
+                    if is_reserved_words(res) {
                         // 
                         return Some(Token::Reserved(res));
                     }
@@ -75,7 +75,7 @@ impl<'a> Iterator for TokenIter<'a> {
                 else {
                     let res = self.s;
                     self.consume(res);
-                    if is_reserved_words(&res) {
+                    if is_reserved_words(res) {
                         return Some(Token::Reserved(res));
                     }
                     return Some(Token::LVar(res));
@@ -123,10 +123,5 @@ mod test {
         assert_eq!(" + 2 * 3", iter.s);
         println!("{:?}",iter.consume("+"));
         assert_eq!(" 2 * 3", iter.s);      
-    }
-    #[test]
-    fn test_OO() {
-        let s = "  ebs rtt";
-        println!("{:?}", s.trim_start());
     }
 }
