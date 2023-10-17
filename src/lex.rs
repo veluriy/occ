@@ -25,9 +25,10 @@ impl Token<'_> {
 impl TokenIter<'_> {
     pub fn consume(&mut self, s: &str) -> bool {
         self.s
+            .trim_start()
             .starts_with(s)
             .then(|| {
-                self.s = &self.s[s.len()..];
+                self.s = &self.s.trim_start()[s.len()..];
             })
             .is_some()
     }
@@ -43,8 +44,8 @@ impl<'a> Iterator for TokenIter<'a> {
         if self.s.is_empty() {
             return None;
         }
-        while self.consume(" ") {}
 
+        self.s = self.s.trim_start();
 
         // > と =>のような部分列の関係にある文字列に注意
         let operands = vec!["+", "-", "*", "/", "(", ")", "<=", "=>", ">", "<", "=="];
@@ -114,5 +115,18 @@ mod test {
         assert_eq!(" + 2 * 3", iter.s);
         println!("{:?}",iter.next());
         assert_eq!(" 2 * 3", iter.s);
+    }
+    #[test]
+    fn test_consume(){
+        let mut iter = TokenIter { s: "1 + 2 * 3" };
+        println!("{:?}",iter.consume("1"));
+        assert_eq!(" + 2 * 3", iter.s);
+        println!("{:?}",iter.consume("+"));
+        assert_eq!(" 2 * 3", iter.s);      
+    }
+    #[test]
+    fn test_OO() {
+        let s = "  ebs rtt";
+        println!("{:?}", s.trim_start());
     }
 }

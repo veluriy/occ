@@ -8,7 +8,7 @@ fn main() {
         process::exit(1);
     }
     // args[1]から空白を削除してそれをgenerate_assembly関数に渡したい
-    args[1].retain(|c| !c.is_whitespace());
+    //args[1].retain(|c| !c.is_whitespace());
     //
     generate_assembly(&args[1]);
 }
