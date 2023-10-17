@@ -1,4 +1,3 @@
-
 use crate::types::{Node, Num, Parser, Token};
 
 impl<'a> Parser<'a> {
