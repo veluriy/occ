@@ -14,7 +14,9 @@ pub type Num = u8;
 pub enum Token<'a> {
     Operand(&'a str), // Plusなどの演算子をまとめる予定
     Num(Num),
+    /// 変数
     LVar(&'a str),
+    /// 予約語に対応する
     Reserved(&'a str),
 }
 
@@ -30,8 +32,7 @@ pub fn tokenize(s: &str) -> TokenIter<'_> {
     TokenIter { s }
 }
 
-/// パーサー
-/// イテレータを持つ
+/// パーサー。イテレータを持つ
 #[derive(Debug)]
 pub struct Parser<'a> {
     pub token_iter: &'a mut TokenIter<'a>,

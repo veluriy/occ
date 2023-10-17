@@ -13,7 +13,7 @@ pub fn is_reserved_words(s: &str) -> bool {
 }
 
 impl Token<'_> {
-    /// あとで使う便利関数。
+    /// 対応する記号が数字であれば、その数字を返す。そうでなければ異常終了。
     pub fn expect_num(&self) -> Num {
         match self {
             Token::Num(n) => *n,
@@ -23,6 +23,8 @@ impl Token<'_> {
 }
 
 impl TokenIter<'_> {
+    /// 開始トークンがsと一致したらその分トークンを読み進める
+    /// 返り値は文字列を進めたか進めていないか
     pub fn consume(&mut self, s: &str) -> bool {
         self.s
             .trim_start()
@@ -44,7 +46,7 @@ impl<'a> Iterator for TokenIter<'a> {
         if self.s.is_empty() {
             return None;
         }
-        
+
         self.s = self.s.trim_start();
 
         // > と =>のような部分列の関係にある文字列に注意

@@ -103,62 +103,6 @@ impl<'a> Parser<'a> {
         }
         self.primary()
     }
-
-    // 次のトークンを読み取るが、文字列の変更はしない
-   /* pub fn next_reaonly(&self) -> Option<Token> {
-        if self.token_iter.s.is_empty() {
-            return None;
-        }
-
-        let first_idx_not_whitespace = self.token_iter.s.chars().position(|c| !c.is_alphabetic() && c != '_');
-        if let Some(idx) = first_idx_not_whitespace {
-
-        }
-
-        // > と =>のような部分列の関係にある文字列に注意
-        let operands = vec!["+", "-", "*", "/", "(", ")", "<=", "=>", ">", "<", "=="];
-        // operands.sort_by_key(f)
-        for op in operands {
-            if self.token_iter.s.starts_with(op) {
-                self.token_iter.consume(op);
-                return Some(Token::Operand(op));
-            }
-        }
-        // 'return' や 'var'などの文字列の場合の処理
-        if let Some(char) = self.token_iter.s.chars().nth(0) {
-            if char.is_alphabetic() {
-                // 変数名としてはアルファベットか_のみを許容
-                let first_non_alphabetic_idx = self.token_iter.s.chars().position(|c| !c.is_alphabetic() && c != '_');
-                // アルファベットではない文字が文字列中にあるので、その前までをresに格納->consume
-                if let Some(idx) = first_non_alphabetic_idx {
-                    let res = &self.token_iter.s[..idx];
-                    self.token_iter.consume(res);
-                    if is_reserved_words(&res) {
-                        // 
-                        return Some(Token::Reserved(res));
-                    }
-                    return Some(Token::LVar(res));
-                }
-                // 文字列のすべてがアルファベットなので、すべてを消化する。
-                else {
-                    let res = self.token_iter.s;
-                    self.token_iter.consume(res);
-                    if is_reserved_words(&res) {
-                        return Some(Token::Reserved(res));
-                    }
-                    return Some(Token::LVar(res));
-                }
-            }
-        } else {
-            // self.s == ""
-            return None;
-        }
-        let (digit_s, _remain_s) = split_digit(self.token_iter.s);
-        if !digit_s.is_empty() {
-            return Some(Token::Num(Num::from_str_radix(digit_s, 10).unwrap()));
-        }
-        panic!("Invalid token stream");
-    }*/
 }
 
 /// 構文木を作るための補助的な関数
