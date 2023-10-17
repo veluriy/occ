@@ -1,4 +1,3 @@
-use crate::lex::split_digit;
 use crate::types::{Node, Num, Parser, Token};
 
 impl<'a> Parser<'a> {
@@ -103,26 +102,6 @@ impl<'a> Parser<'a> {
         }
         self.primary()
     }
-
-    /// 次のトークンを読み取るが、文字列の変更はしない
-    pub fn next_readonly(&self) -> Option<Token> {
-        if self.token_iter.s.is_empty() {
-            return None;
-        }
-        // > と =>のような部分列の関係にある文字列に注意
-        let operands = vec!["+", "-", "*", "/", "(", ")", "<=", "=>", ">", "<", "=="];
-        // operands.sort_by_key(f)
-        for op in operands {
-            if self.token_iter.s.starts_with(op) {
-                return Some(Token::Operand(op));
-            }
-        }
-        let (digit_s, _remain_s) = split_digit(self.token_iter.s);
-        if !digit_s.is_empty() {
-            return Some(Token::Num(Num::from_str_radix(digit_s, 10).unwrap()));
-        }
-        panic!("Invalid token stream");
-    }
 }
 
 /// 構文木を作るための補助的な関数
@@ -154,7 +133,7 @@ mod test {
 
     #[test]
     fn test_parser() {
-        let mut iter = TokenIter { s: "1<2+3" };
+        let mut iter = TokenIter { s: "1 < 2 + 3" };
         let mut parser = Parser {
             token_iter: &mut iter,
         };

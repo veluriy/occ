@@ -6,8 +6,16 @@ pub fn split_digit(s: &str) -> (&str, &str) {
     s.split_at(first_non_num_idx)
 }
 
+/// 文字列に対応するトークンがreturnなどの予約語なのかを判別
+pub fn is_reserved_words(s: &str) -> bool {
+    if s == "return" {
+        return true;
+    }
+    false
+}
+
 impl Token<'_> {
-    /// あとで使う便利関数。
+    /// 対応する記号が数字であれば、その数字を返す。そうでなければ異常終了。
     pub fn expect_num(&self) -> Num {
         match self {
             Token::Num(n) => *n,
@@ -17,11 +25,14 @@ impl Token<'_> {
 }
 
 impl TokenIter<'_> {
+    /// 開始トークンがsと一致したらその分トークンを読み進める
+    /// 返り値は文字列を進めたか進めていないか
     pub fn consume(&mut self, s: &str) -> bool {
         self.s
+            .trim_start()
             .starts_with(s)
             .then(|| {
-                self.s = &self.s[s.len()..];
+                self.s = &self.s.trim_start()[s.len()..];
             })
             .is_some()
     }
@@ -38,6 +49,8 @@ impl<'a> Iterator for TokenIter<'a> {
             return None;
         }
 
+        self.s = self.s.trim_start();
+
         // > と =>のような部分列の関係にある文字列に注意
         let operands = vec!["+", "-", "*", "/", "(", ")", "<=", "=>", ">", "<", "=="];
         // operands.sort_by_key(f)
@@ -47,13 +60,43 @@ impl<'a> Iterator for TokenIter<'a> {
                 return Some(Token::Operand(op));
             }
         }
+        // 'return' や 'var'などの文字列の場合の処理
+        if let Some(char) = self.s.chars().nth(0) {
+            if char.is_alphabetic() {
+                // 変数名としてはアルファベットか_のみを許容
+                let first_non_alphabetic_idx =
+                    self.s.chars().position(|c| !c.is_alphabetic() && c != '_');
+                // アルファベットではない文字が文字列中にあるので、その前までをresに格納->consume
+                if let Some(idx) = first_non_alphabetic_idx {
+                    let res = &self.s[..idx];
+                    self.consume(res);
+                    if is_reserved_words(res) {
+                        //
+                        return Some(Token::Reserved(res));
+                    }
+                    return Some(Token::LVar(res));
+                }
+                // 文字列のすべてがアルファベットなので、すべてを消化する。
+                else {
+                    let res = self.s;
+                    self.consume(res);
+                    if is_reserved_words(res) {
+                        return Some(Token::Reserved(res));
+                    }
+                    return Some(Token::LVar(res));
+                }
+            }
+        } else {
+            // self.s == ""
+            return None;
+        }
+        // self.s.chars().position(|c| !c.is_alphabetic() && c != '_');
 
         let (digit_s, remain_s) = split_digit(self.s);
         if !digit_s.is_empty() {
             self.s = remain_s;
             return Some(Token::Num(Num::from_str_radix(digit_s, 10).unwrap()));
         }
-        eprintln!("s:{:?}", remain_s);
         panic!("");
     }
 }
@@ -63,11 +106,29 @@ mod test {
     use crate::types::TokenIter;
 
     #[test]
-    fn test() {
-        let mut iter = TokenIter { s: "3+4" };
-        iter.next();
-        assert_eq!("+4", iter.s);
-        iter.next();
-        assert_eq!("4", iter.s);
+    fn test_return() {
+        let mut iter = TokenIter {
+            s: "return returns",
+        };
+        println!("{:?}", iter.next());
+        assert_eq!(" returns", iter.s);
+        println!("{:?}", iter.next());
+        assert_eq!("", iter.s);
+    }
+    #[test]
+    fn test_expr() {
+        let mut iter = TokenIter { s: "1 + 2 * 3" };
+        println!("{:?}", iter.next());
+        assert_eq!(" + 2 * 3", iter.s);
+        println!("{:?}", iter.next());
+        assert_eq!(" 2 * 3", iter.s);
+    }
+    #[test]
+    fn test_consume() {
+        let mut iter = TokenIter { s: "1 + 2 * 3" };
+        println!("{:?}", iter.consume("1"));
+        assert_eq!(" + 2 * 3", iter.s);
+        println!("{:?}", iter.consume("+"));
+        assert_eq!(" 2 * 3", iter.s);
     }
 }
