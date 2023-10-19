@@ -1,48 +1,105 @@
-use crate::types::{Node, Token};
+use crate::types::{Node, Token, Variables};
 
-/// 構文木からアセンブリコードを再帰的に作る
-pub fn print_assembly_by_node(node: &Node) {
-    if let Token::Num(n) = node.kind {
-        println!("  push {:?}", n);
-        return;
+fn generate_lvar(node: &Node, vars: &Variables) {
+    // 変数であるかを見る
+    if let Token::LVar(name) = node.kind {
+        // オフセットを取得
+        if let Some(offset) = vars.offsets.get(name) {
+            println!("  mov rax, rbp");
+            println!("  sub rax, {}", offset);
+            println!("  push rax");
+        } else {
+            panic!("the offset cannot be found.")
+        }
+    } else {
+        panic!("")
     }
-    if let Some(b) = &node.lhs {
-        print_assembly_by_node(b);
-    }
-    if let Some(b) = &node.rhs {
-        print_assembly_by_node(b);
-    }
-    println!("  pop rdi");
-    println!("  pop rax");
+}
+
+pub fn print_assembly_by_node(node: &Node, vars: &Variables) {
     match node.kind {
-        Token::Operand("+") => println!("  add rax, rdi"),
-        Token::Operand("-") => println!("  sub rax, rdi"),
-        Token::Operand("*") => println!("  imul rax, rdi"),
-        Token::Operand("/") => {
-            println!("  cqo");
-            println!("  idiv rdi");
+        Token::Num(n) => {
+            println!("  push {}", n);
         }
-        Token::Operand("==") => {
-            println!("cmp rax, rdi");
-            println!("sete al");
-            println!("movzb rax, al");
+        Token::LVar(_name) => {
+            generate_lvar(node, vars);
+            println!("  pop rax");
+            println!("  mov rax, [rax]");
+            println!("  push rax");
         }
-        Token::Operand("<") => {
-            println!("cmp rax, rdi");
-            println!("setl al");
-            println!("movzb rax, al");
+        Token::Operand(op) => {
+            // '='の時は特別に、左辺値の扱いが他の二項演算と異なる。
+            if op == "=" {
+                if let Some(b) = &node.lhs {
+                    generate_lvar(b, vars);
+                }
+                if let Some(b) = &node.rhs {
+                    print_assembly_by_node(b, vars);
+                }
+                println!("  pop rdi");
+                println!("  pop rax");
+                println!("  mov [rax], rdi");
+                println!("  push rdi");
+                return;
+            }
+            // operand ... 二項
+            if let Some(b) = &node.lhs {
+                print_assembly_by_node(b, vars);
+            }
+            if let Some(b) = &node.rhs {
+                print_assembly_by_node(b, vars);
+            }
+            println!("  pop rdi");
+            println!("  pop rax");
+            match op {
+                "+" => {
+                    println!("  add rax, rdi");
+                    println!("  push rax");
+                }
+                "-" => {
+                    println!("  sub rax, rdi");
+                    println!("  push rax");
+                }
+                "*" => {
+                    println!("  imul rax, rdi");
+                    println!("  push rax");
+                }
+                "/" => {
+                    println!("  cqo");
+                    println!("  idiv rdi");
+                    println!("  push rax");
+                }
+                "<" => {
+                    println!("  cmp rax, rdi");
+                    println!("  setl al");
+                    println!("  movzb rax, al");
+                    println!("  push rax");
+                }
+                "<=" => {
+                    println!("  cmp rax, rdi");
+                    println!("  setle al");
+                    println!("  movzb rax, al");
+                    println!("  push rax");
+                }
+                "!=" => {
+                    println!("  cmp rax, rdi");
+                    println!("  setne al");
+                    println!("  movzb rax, al");
+                    println!("  push rax");
+                }
+                "==" => {
+                    println!("  cmp rax, rdi");
+                    println!("  sete al");
+                    println!("  movzb rax, al");
+                    println!("  push rax");
+                }
+                _ => {
+                    //
+                }
+            }
         }
-        Token::Operand("<=") => {
-            println!("cmp rax, rdi");
-            println!("setle al");
-            println!("movzb rax, al");
+        Token::Reserved(_name) => {
+            // 未実装
         }
-        Token::Operand("!=") => {
-            println!("cmp rax, rdi");
-            println!("setne al");
-            println!("movzb rax, al");
-        }
-        _ => {}
-    };
-    println!("  push rax");
+    }
 }

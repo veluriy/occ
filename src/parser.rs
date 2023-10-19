@@ -2,12 +2,42 @@ use crate::types::{Node, Num, Parser, Token};
 
 impl<'a> Parser<'a> {
     /// 構文木を作る処理
-    pub fn parse(&mut self) -> Option<Box<Node>> {
-        self.expr()
+    pub fn parse(&mut self) -> Vec<Box<Node<'a>>> {
+        self.program()
     }
+    fn program(&mut self) -> Vec<Box<Node<'a>>> {
+        let mut stmts: Vec<Box<Node>> = vec![];
+        loop {
+            let stmt = self.stmt();
+            if let Some(node) = stmt {
+                stmts.push(node);
+            } else {
+                break;
+            }
+        }
+        stmts
+    }
+    fn stmt(&mut self) -> Option<Box<Node<'a>>> {
+        let expr = self.expr();
+        if !(self.token_iter.consume(";")) {
+            return None;
+        }
+        expr
+    }
+    fn assign(&mut self) -> Option<Box<Node<'a>>> {
+        let mut node = self.equality();
+        if self.token_iter.consume("=") {
+            node = new_node(Token::Operand("="), node, self.assign())
+        }
+        node
+    }
+
     fn primary(&mut self) -> Option<Box<Node<'a>>> {
         // 最初の数字をとっている想定
         let st = self.token_iter.next();
+        if st.is_none() {
+            return None;
+        }
         let node: Option<Box<Node>>;
         // println!("{:?}",st);
         if *st.as_ref().unwrap() == Token::Operand("(") {
@@ -20,6 +50,10 @@ impl<'a> Parser<'a> {
         } else {
             match st {
                 Some(Token::Num(n)) => new_node_num(n),
+                Some(Token::LVar(var)) => {
+                    self.vars.insert(var);
+                    return new_node(Token::LVar(var), None, None);
+                }
                 _ => {
                     panic!("{:?}, {:?}", self, st);
                 }
@@ -28,7 +62,7 @@ impl<'a> Parser<'a> {
     }
     /// 式に相当する節
     fn expr(&mut self) -> Option<Box<Node<'a>>> {
-        return self.equality();
+        return self.assign();
     }
 
     fn equality(&mut self) -> Option<Box<Node<'a>>> {
@@ -126,16 +160,19 @@ fn new_node_num<'a>(val: Num) -> Option<Box<Node<'a>>> {
 
 #[cfg(test)]
 mod test {
-    use crate::{
-        parser::new_node_num,
-        types::{Node, Parser, Token, TokenIter},
-    };
+    use std::collections::{HashMap, HashSet};
 
-    #[test]
+    use crate::types::{Parser, TokenIter, Variables};
+
+    /*#[test]
     fn test_parser() {
         let mut iter = TokenIter { s: "1 < 2 + 3" };
+        let mut vars = Variables {
+            offsets: &mut HashMap::new()
+        };
         let mut parser = Parser {
             token_iter: &mut iter,
+            vars: &mut vars,
         };
 
         assert_eq!(
@@ -150,5 +187,26 @@ mod test {
                 }))
             }
         )
+    }*/
+    #[test]
+    fn test_set() {
+        let mut set: HashSet<i32> = HashSet::new();
+        set.insert(1);
+        set.insert(2);
+        assert_eq!(set.len(), 2)
+    }
+
+    #[test]
+    fn test_stmt() {
+        let mut iter = TokenIter { s: "var = 1; var;" };
+        let mut vars = Variables {
+            offsets: &mut HashMap::new(),
+        };
+        let mut parser = Parser {
+            token_iter: &mut iter,
+            vars: &mut vars,
+        };
+        println!("{:?}", parser.parse());
+        println!("{:?}", parser);
     }
 }

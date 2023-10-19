@@ -1,5 +1,7 @@
+use std::collections::HashMap;
+
 /// 構文木
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct Node<'a> {
     pub kind: Token<'a>,
     pub lhs: Option<Box<Node<'a>>>,
@@ -10,7 +12,7 @@ pub struct Node<'a> {
 pub type Num = u8;
 
 /// トークン
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum Token<'a> {
     Operand(&'a str), // Plusなどの演算子をまとめる予定
     Num(Num),
@@ -36,4 +38,38 @@ pub fn tokenize(s: &str) -> TokenIter<'_> {
 #[derive(Debug)]
 pub struct Parser<'a> {
     pub token_iter: &'a mut TokenIter<'a>,
+    /// 検出した変数名とそれに対応するオフセットを格納する。
+    pub vars: &'a mut Variables<'a>,
+}
+
+#[derive(Debug)]
+pub struct Variables<'a> {
+    pub offsets: &'a mut HashMap<&'a str, usize>,
+}
+
+impl<'a> Variables<'a> {
+    pub fn insert(&mut self, str: &'a str) -> Option<usize> {
+        if !self.offsets.contains_key(str) {
+            self.offsets.insert(str, self.offsets.len() * 8)
+        } else {
+            None
+        }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::Variables;
+    use std::collections::HashMap;
+
+    #[test]
+    fn test_var() {
+        let mut vars = Variables {
+            offsets: &mut HashMap::new(),
+        };
+        vars.insert("var1");
+        vars.insert("var2");
+        vars.insert("var1");
+        println!("{:?}", vars);
+    }
 }
