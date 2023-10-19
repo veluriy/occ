@@ -14,7 +14,7 @@ pub fn generate_assembly(str: &str) {
     println!("main:");
     let mut iter = tokenize(str);
     let mut vars = Variables {
-        offsets: &mut HashMap::new()
+        offsets: &mut HashMap::new(),
     };
     let mut parser = Parser {
         token_iter: &mut iter,

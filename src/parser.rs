@@ -11,8 +11,9 @@ impl<'a> Parser<'a> {
             let stmt = self.stmt();
             if let Some(node) = stmt {
                 stmts.push(node);
-            } 
-            else {break;}
+            } else {
+                break;
+            }
         }
         return stmts;
     }
@@ -22,7 +23,6 @@ impl<'a> Parser<'a> {
             return None;
         }
         return expr;
-
     }
     fn assign(&mut self) -> Option<Box<Node<'a>>> {
         let mut node = self.equality();
@@ -31,7 +31,6 @@ impl<'a> Parser<'a> {
         }
         return node;
     }
-    
 
     fn primary(&mut self) -> Option<Box<Node<'a>>> {
         // 最初の数字をとっている想定
@@ -54,7 +53,7 @@ impl<'a> Parser<'a> {
                 Some(Token::LVar(var)) => {
                     self.vars.insert(var);
                     return new_node(Token::LVar(var), None, None);
-                },
+                }
                 _ => {
                     panic!("{:?}, {:?}", self, st);
                 }
@@ -161,7 +160,7 @@ fn new_node_num<'a>(val: Num) -> Option<Box<Node<'a>>> {
 
 #[cfg(test)]
 mod test {
-    use std::collections::{HashSet, HashMap};
+    use std::collections::{HashMap, HashSet};
 
     use crate::{
         parser::new_node_num,
@@ -204,7 +203,7 @@ mod test {
     fn test_stmt() {
         let mut iter = TokenIter { s: "var = 1; var;" };
         let mut vars = Variables {
-            offsets: &mut HashMap::new()
+            offsets: &mut HashMap::new(),
         };
         let mut parser = Parser {
             token_iter: &mut iter,

@@ -1,4 +1,4 @@
-use std::collections::{HashSet, HashMap};
+use std::collections::{HashMap, HashSet};
 
 /// 構文木
 #[derive(Debug, PartialEq, Clone)]
@@ -47,7 +47,6 @@ pub struct Variables<'a> {
     pub offsets: &'a mut HashMap<&'a str, usize>,
 }
 
-
 impl<'a> Variables<'a> {
     pub fn insert(&mut self, str: &'a str) -> Option<usize> {
         if !self.offsets.contains_key(str) {
@@ -60,13 +59,13 @@ impl<'a> Variables<'a> {
 
 #[cfg(test)]
 mod test {
-    use std::collections::HashMap;
     use super::Variables;
+    use std::collections::HashMap;
 
     #[test]
     fn test_var() {
-        let mut vars = Variables{
-            offsets: &mut HashMap::new()
+        let mut vars = Variables {
+            offsets: &mut HashMap::new(),
         };
         vars.insert("var1");
         vars.insert("var2");
