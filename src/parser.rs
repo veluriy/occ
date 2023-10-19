@@ -202,7 +202,7 @@ mod test {
 
     #[test]
     fn test_stmt() {
-        let mut iter = TokenIter { s: "var = 1 + 1; varr = 2+3;" };
+        let mut iter = TokenIter { s: "var = 1; var;" };
         let mut vars = Variables {
             offsets: &mut HashMap::new()
         };
