@@ -20,10 +20,16 @@ pub fn generate_assembly(str: &str) {
         token_iter: &mut iter,
         vars: &mut vars,
     };
-    let node = parser.parse();
-    /*if let Some(b) = node {
-        print_assembly_by_node(&b);
-    }*/
-    println!("  pop rax");
+    let nodes = parser.parse();
+    println!("  push rbp");
+    println!("  mov rbp, rsp");
+    println!("  sub rsp, {}", &parser.vars.offsets.len() * 8);
+
+    for node in nodes {
+        print_assembly_by_node(&node, &parser.vars);
+        println!("  pop rax");
+    }
+    println!("  mov rsp, rbp");
+    println!("  pop rbp");
     println!("  ret");
 }
