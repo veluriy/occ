@@ -1,4 +1,4 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 
 /// 構文木
 #[derive(Debug, PartialEq, Clone)]
@@ -50,9 +50,9 @@ pub struct Variables<'a> {
 impl<'a> Variables<'a> {
     pub fn insert(&mut self, str: &'a str) -> Option<usize> {
         if !self.offsets.contains_key(str) {
-            return self.offsets.insert(str, self.offsets.len() * 8);
+            self.offsets.insert(str, self.offsets.len() * 8)
         } else {
-            return None;
+            None
         }
     }
 }

@@ -26,7 +26,7 @@ pub fn generate_assembly(str: &str) {
     println!("  sub rsp, {}", &parser.vars.offsets.len() * 8);
 
     for node in nodes {
-        print_assembly_by_node(&node, &parser.vars);
+        print_assembly_by_node(&node, parser.vars);
         println!("  pop rax");
     }
     println!("  mov rsp, rbp");

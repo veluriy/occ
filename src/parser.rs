@@ -15,27 +15,27 @@ impl<'a> Parser<'a> {
                 break;
             }
         }
-        return stmts;
+        stmts
     }
     fn stmt(&mut self) -> Option<Box<Node<'a>>> {
         let expr = self.expr();
         if !(self.token_iter.consume(";")) {
             return None;
         }
-        return expr;
+        expr
     }
     fn assign(&mut self) -> Option<Box<Node<'a>>> {
         let mut node = self.equality();
         if self.token_iter.consume("=") {
             node = new_node(Token::Operand("="), node, self.assign())
         }
-        return node;
+        node
     }
 
     fn primary(&mut self) -> Option<Box<Node<'a>>> {
         // 最初の数字をとっている想定
         let st = self.token_iter.next();
-        if st == None {
+        if st.is_none() {
             return None;
         }
         let node: Option<Box<Node>>;
@@ -162,10 +162,7 @@ fn new_node_num<'a>(val: Num) -> Option<Box<Node<'a>>> {
 mod test {
     use std::collections::{HashMap, HashSet};
 
-    use crate::{
-        parser::new_node_num,
-        types::{Node, Parser, Token, TokenIter, Variables},
-    };
+    use crate::types::{Parser, TokenIter, Variables};
 
     /*#[test]
     fn test_parser() {

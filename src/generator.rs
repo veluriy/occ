@@ -20,9 +20,8 @@ pub fn print_assembly_by_node(node: &Node, vars: &Variables) {
     match node.kind {
         Token::Num(n) => {
             println!("  push {}", n);
-            return;
         }
-        Token::LVar(name) => {
+        Token::LVar(_name) => {
             generate_lvar(node, vars);
             println!("  pop rax");
             println!("  mov rax, [rax]");
@@ -99,7 +98,7 @@ pub fn print_assembly_by_node(node: &Node, vars: &Variables) {
                 }
             }
         }
-        Token::Reserved(name) => {
+        Token::Reserved(_name) => {
             // 未実装
         }
     }
