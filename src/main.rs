@@ -1,4 +1,4 @@
-use occ::{Input, run};
+use occ::{run, Input};
 use std::{env, process};
 
 fn main() {
