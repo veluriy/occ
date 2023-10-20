@@ -38,7 +38,28 @@ impl<'a> Parser<'a> {
             }
             node = new_node_if(cond, then, els);
         } else if self.token_iter.consume("for") {
-            node = new_node(Token::Reserved("return"), self.expr(), None);
+            // for ([init], [cond]; [inc]) [stmt]
+            let mut init: Option<Box<Node<'_>>> = None;
+            let mut cond: Option<Box<Node<'_>>> = None;
+            let mut inc: Option<Box<Node<'_>>> = None;
+            let then: Option<Box<Node<'_>>>;
+            self.token_iter.consume("(");
+            // init
+            if !self.token_iter.consume(";") {
+                init = self.stmt();
+            }
+            // cond
+            if !self.token_iter.consume(";") {
+                cond = self.stmt();
+            }
+            // inc
+            if !self.token_iter.consume(";") {
+                inc = self.stmt();
+            }
+            self.token_iter.consume(")");
+            then = self.stmt();
+
+            node = new_node_for(init, cond, inc, then);
         } else {
             node = self.expr()
         }
@@ -212,6 +233,7 @@ fn new_node_for<'a>(
     init: Option<Box<Node<'a>>>,
     cond: Option<Box<Node<'a>>>,
     inc: Option<Box<Node<'a>>>,
+    then: Option<Box<Node<'a>>>,
 ) -> Option<Box<Node<'a>>> {
     let node = Node {
         kind: Token::Reserved("for"),
@@ -281,6 +303,20 @@ mod test {
     #[test]
     fn debug_if() {
         let mut iter = TokenIter { s: "if 3 == 1 a=1;else a=0;" };
+        let mut vars = Variables {
+            offsets: &mut HashMap::new(),
+        };
+        let mut parser = Parser {
+            token_iter: &mut iter,
+            vars: &mut vars,
+        };
+        println!("{:?}", parser.parse());
+        println!("{:?}", parser);
+    }
+
+    #[test]
+    fn debug_for() {
+        let mut iter = TokenIter { s: "for(i=0;i<5;i=i+1;) return 0;" };
         let mut vars = Variables {
             offsets: &mut HashMap::new(),
         };
