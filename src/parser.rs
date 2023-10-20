@@ -18,11 +18,16 @@ impl<'a> Parser<'a> {
         stmts
     }
     fn stmt(&mut self) -> Option<Box<Node<'a>>> {
-        let expr = self.expr();
+        let mut node;
+        if self.token_iter.consume("return") {
+            node = new_node(Token::Reserved("return"), self.expr(), None);
+        } else {
+            node = self.expr()
+        }
         if !(self.token_iter.consume(";")) {
             return None;
         }
-        expr
+        node
     }
     fn assign(&mut self) -> Option<Box<Node<'a>>> {
         let mut node = self.equality();
