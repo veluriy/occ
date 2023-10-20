@@ -1,11 +1,13 @@
-use occ::generate_assembly;
+use occ::{run, Input};
 use std::{env, process};
 
 fn main() {
     let args: Vec<String> = env::args().collect();
-    if args.len() != 2 {
-        eprintln!("引数の数が異なります");
+
+    let input = Input::new(&args).unwrap_or_else(|err| {
+        eprintln!("Problem parsing arguments: {}", err);
         process::exit(1);
-    }
-    generate_assembly(&args[1]);
+    });
+
+    run(input);
 }
