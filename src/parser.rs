@@ -150,7 +150,8 @@ fn new_node<'a>(
     lhs: Option<Box<Node<'a>>>,
     rhs: Option<Box<Node<'a>>>,
 ) -> Option<Box<Node<'a>>> {
-    Some(Box::new(Node { kind, lhs, rhs }))
+    Some(Box::new(Node { kind, lhs, rhs, cond: None, then: None, els: None,         init: None,
+        inc: None, }))
 }
 
 /// 数字に対応した節を作る
@@ -159,6 +160,50 @@ fn new_node_num<'a>(val: Num) -> Option<Box<Node<'a>>> {
         kind: Token::Num(val),
         lhs: None,
         rhs: None,
+        cond: None,
+        then: None,
+        els: None,
+        init: None,
+        inc: None,
+    };
+    Some(Box::new(node))
+}
+
+// ifに対応した節を作る
+fn new_node_if<'a>(
+    val: Num,
+    cond: Option<Box<Node<'a>>>,
+    then: Option<Box<Node<'a>>>,
+    els: Option<Box<Node<'a>>>,
+) -> Option<Box<Node<'a>>> {
+    let node = Node {
+        kind: Token::Reserved("if"),
+        lhs: None,
+        rhs: None,
+        cond,
+        then,
+        els,
+        init: None,
+        inc: None,
+    };
+    Some(Box::new(node))
+}
+
+// forに対応した節を作る
+fn new_node_for<'a>(
+    init: Option<Box<Node<'a>>>,
+    cond: Option<Box<Node<'a>>>,
+    inc: Option<Box<Node<'a>>>,
+) -> Option<Box<Node<'a>>> {
+    let node = Node {
+        kind: Token::Reserved("for"),
+        lhs: None,
+        rhs: None,
+        cond,
+        then: None,
+        els: None,
+        init,
+        inc,
     };
     Some(Box::new(node))
 }

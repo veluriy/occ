@@ -6,6 +6,13 @@ pub struct Node<'a> {
     pub kind: Token<'a>,
     pub lhs: Option<Box<Node<'a>>>,
     pub rhs: Option<Box<Node<'a>>>,
+    // if [cond] then [then] else [els]
+    pub cond: Option<Box<Node<'a>>>,
+    pub then: Option<Box<Node<'a>>>,
+    pub els: Option<Box<Node<'a>>>,
+    // for(init, cond, inc)
+    pub init: Option<Box<Node<'a>>>,
+    pub inc: Option<Box<Node<'a>>>,
 }
 
 /// 使う数値型
