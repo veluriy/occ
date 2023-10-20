@@ -240,7 +240,7 @@ fn new_node_for<'a>(
         lhs: None,
         rhs: None,
         cond,
-        then: None,
+        then,
         els: None,
         init,
         inc,
