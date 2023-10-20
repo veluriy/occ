@@ -21,7 +21,6 @@ assert() {
   fi
 }
 
-
 assert 0 "3-3;"
 assert 4 "3+4-3;"
 assert 18 "3*(1+5);"
@@ -40,5 +39,6 @@ assert 0 "a=0;"
 assert 5 "a=1;a+4;"
 assert 5 "a=1;b=4;a+b;"
 assert 0 "a=1<2;a==4;"
+assert 0 "a=11;return0;b=a;return1;"
 
 echo OK
