@@ -21,12 +21,31 @@ impl<'a> Parser<'a> {
         let node;
         if self.token_iter.consume("return") {
             node = new_node(Token::Reserved("return"), self.expr(), None);
+        } else if self.token_iter.consume("if") {
+            // cond, then, elsが必要
+            let cond: Option<Box<Node<'_>>>;
+            let then: Option<Box<Node<'_>>>;
+            // ない可能性があるため、Noneで初期化
+            let mut els: Option<Box<Node<'_>>> = None;
+
+            // if (cond) or if cond
+            cond = self.expr();
+            // then
+            then = self.stmt();
+            // もしelseが続いた場合、その後のstmtをelseの処理とみなす
+            if self.token_iter.consume("else") {
+                els = self.stmt();
+            }
+            node = new_node_if(cond, then, els);
+        } else if self.token_iter.consume("for") {
+            node = new_node(Token::Reserved("return"), self.expr(), None);
         } else {
             node = self.expr()
         }
-        if !(self.token_iter.consume(";")) {
+        self.token_iter.consume(";");
+        /*if !(self.token_iter.consume(";")) {
             return None;
-        }
+        }*/
         node
     }
     fn assign(&mut self) -> Option<Box<Node<'a>>> {
@@ -171,7 +190,6 @@ fn new_node_num<'a>(val: Num) -> Option<Box<Node<'a>>> {
 
 // ifに対応した節を作る
 fn new_node_if<'a>(
-    val: Num,
     cond: Option<Box<Node<'a>>>,
     then: Option<Box<Node<'a>>>,
     els: Option<Box<Node<'a>>>,
@@ -249,6 +267,20 @@ mod test {
     #[test]
     fn test_stmt() {
         let mut iter = TokenIter { s: "var = 1; var;" };
+        let mut vars = Variables {
+            offsets: &mut HashMap::new(),
+        };
+        let mut parser = Parser {
+            token_iter: &mut iter,
+            vars: &mut vars,
+        };
+        println!("{:?}", parser.parse());
+        println!("{:?}", parser);
+    }
+
+    #[test]
+    fn debug_if() {
+        let mut iter = TokenIter { s: "if 3 == 1 a=1;else a=0;" };
         let mut vars = Variables {
             offsets: &mut HashMap::new(),
         };
