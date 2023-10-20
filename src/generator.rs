@@ -1,3 +1,4 @@
+use crate::generate_assembly;
 use crate::types::{Node, Token, Variables};
 
 fn generate_lvar(node: &Node, vars: &Variables) {
@@ -26,6 +27,22 @@ pub fn print_assembly_by_node(node: &Node, vars: &Variables) {
             println!("  pop rax");
             println!("  mov rax, [rax]");
             println!("  push rax");
+        }
+        Token::Reserved("return") => {
+            if let Some(b) = &node.lhs {
+                match b.kind {
+                    Token::LVar(_) => {
+                        generate_lvar(b, vars);
+                    }
+                    _ => {
+                        print_assembly_by_node(b, vars);
+                    }
+                }
+            }
+            println!("  pop rax");
+            println!("  mov rsp, rbp");
+            println!("  pop rbp");
+            println!("  ret");
         }
         Token::Operand(op) => {
             // '='の時は特別に、左辺値の扱いが他の二項演算と異なる。
