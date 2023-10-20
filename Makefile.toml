@@ -1,0 +1,14 @@
+[tasks.test]
+command = "bash"
+args = ["-x", "test/test.sh"]
+
+[tasks.fix]
+command = "cargo"
+args = ["fix"]
+
+[tasks.fmt]
+command = "cargo"
+args = ["fmt"]
+
+[tasks.my-flow]
+dependencies = ["fix", "fmt"]
