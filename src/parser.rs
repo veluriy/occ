@@ -18,7 +18,7 @@ impl<'a> Parser<'a> {
         stmts
     }
     fn stmt(&mut self) -> Option<Box<Node<'a>>> {
-        let mut node;
+        let node;
         if self.token_iter.consume("return") {
             node = new_node(Token::Reserved("return"), self.expr(), None);
         } else {

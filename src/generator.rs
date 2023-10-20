@@ -1,4 +1,4 @@
-use crate::generate_assembly;
+
 use crate::types::{Node, Token, Variables};
 
 fn generate_lvar(node: &Node, vars: &Variables, assembly: &mut String) {
