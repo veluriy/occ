@@ -16,7 +16,7 @@ fn generate_lvar(node: &Node, vars: &Variables, assembly: &mut String) {
     }
 }
 
-pub fn print_assembly_by_node(node: &Node, vars: &Variables, assembly: &mut String) {
+pub fn print_assembly_by_node(node: &Node, vars: &Variables, assembly: &mut String, label_no: &mut u32) {
     match node.kind {
         Token::Num(n) => {
             assembly.push_str(&format!("\tpush {}\n", n));
@@ -29,20 +29,74 @@ pub fn print_assembly_by_node(node: &Node, vars: &Variables, assembly: &mut Stri
         }
         Token::Reserved("return") => {
             if let Some(b) = &node.lhs {
-                match b.kind {
-                    Token::LVar(_) => {
-                        generate_lvar(b, vars, assembly);
-                    }
-                    _ => {
-                        print_assembly_by_node(b, vars, assembly);
-                    }
-                }
+                print_assembly_by_node(b, vars, assembly, label_no);
             }
             assembly.push_str("\tpop rax\n");
             assembly.push_str("\tmov rsp, rbp\n");
             assembly.push_str("\tpop rbp\n");
             assembly.push_str("\tret\n");
         }
+        Token::Reserved("if") => {
+            *label_no += 1;
+            if let Some(b) = &node.cond {
+                print_assembly_by_node(b, vars, assembly, label_no);
+            } else {
+                // todo
+            }
+            assembly.push_str("\tpop rax\n");
+            assembly.push_str("\tcmp rax, 0\n");
+            assembly.push_str(&format!("\tje  .Lelse{}\n", label_no));
+            // B
+            if let Some(b) = &node.then {
+                print_assembly_by_node(b, vars, assembly, label_no);
+            } else {
+                // todo
+            }
+            assembly.push_str(&format!("\tjmp  .Lend{}\n", label_no));
+            assembly.push_str(&format!(".Lelse{}:\n", label_no));
+            // C
+            if let Some(b) = &node.els {
+                print_assembly_by_node(b, vars, assembly, label_no);
+            } else {
+                // todo
+            }
+            assembly.push_str(&format!(".Lend{}:\n", label_no));
+        }
+        Token::Reserved("for") => {
+            *label_no += 1;
+            if let Some(b) = &node.init {
+                print_assembly_by_node(b, vars, assembly, label_no);
+            } else {
+                // todo
+            }
+            assembly.push_str(&format!(".Lbegin{}:\n", label_no));
+            if let Some(b) = &node.cond {
+                print_assembly_by_node(b, vars, assembly, label_no);
+            } else {
+                // todo
+            }
+            assembly.push_str("\tpop rax\n");
+            assembly.push_str("\tcmp rax, 0\n");
+            assembly.push_str(&format!("\tje  .Lend{}\n", label_no));
+            // thenの実行
+            if let Some(b) = &node.then {
+                print_assembly_by_node(b, vars, assembly, label_no);
+            } else {
+                // todo
+            }
+            // 最後にインクリメント処理
+            if let Some(b) = &node.inc {
+                print_assembly_by_node(b, vars, assembly, label_no);
+            } else {
+                // todo
+            }
+            assembly.push_str(&format!("\tjmp  .Lbegin{}\n", label_no));
+            assembly.push_str(&format!(".Lend{}:\n", label_no));
+        }
+        Token::Reserved("while") => {
+            *label_no += 1;
+            // todo
+        }        
         Token::Operand(op) => {
             // '='の時は特別に、左辺値の扱いが他の二項演算と異なる。
             if op == "=" {
@@ -50,7 +104,7 @@ pub fn print_assembly_by_node(node: &Node, vars: &Variables, assembly: &mut Stri
                     generate_lvar(b, vars, assembly);
                 }
                 if let Some(b) = &node.rhs {
-                    print_assembly_by_node(b, vars, assembly);
+                    print_assembly_by_node(b, vars, assembly, label_no);
                 }
                 assembly.push_str("\tpop rdi\n");
                 assembly.push_str("\tpop rax\n");
@@ -60,10 +114,10 @@ pub fn print_assembly_by_node(node: &Node, vars: &Variables, assembly: &mut Stri
             }
             // operand ... 二項
             if let Some(b) = &node.lhs {
-                print_assembly_by_node(b, vars, assembly);
+                print_assembly_by_node(b, vars, assembly, label_no);
             }
             if let Some(b) = &node.rhs {
-                print_assembly_by_node(b, vars, assembly);
+                print_assembly_by_node(b, vars, assembly, label_no);
             }
             assembly.push_str("\tpop rdi\n");
             assembly.push_str("\tpop rax\n");

@@ -47,6 +47,12 @@ assert 0 "a=0;"
 assert 5 "a=1;a+4;"
 assert 5 "a=1;b=4;a+b;"
 assert 0 "a=1<2;a==4;"
-assert 0 "a=11;return 0;b=a;return 1;"
+assert 0 "ab=11;return 0;b=ab;return 1;"
+assert 0 "i=0;return i;"
+assert 22 "a=11;b=a;c=b+a;c;"
+assert 1 "sum=41;i=0;sum == i + 41;"
+assert 0 "if 3 == 3 return 0; else return 222;"
+assert 10 "sum = 0;for(i = 0; i < 5; i = i + 1) sum = sum + i; return sum;"
+
 
 echo OK

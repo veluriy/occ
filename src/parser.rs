@@ -46,27 +46,37 @@ impl<'a> Parser<'a> {
             self.token_iter.consume("(");
             // init
             if !self.token_iter.consume(";") {
-                init = self.stmt();
+                init = self.expr();
+                self.token_iter.consume(";");
             }
             // cond
             if !self.token_iter.consume(";") {
-                cond = self.stmt();
+                cond = self.expr();
+                self.token_iter.consume(";");
             }
-            // inc
-            if !self.token_iter.consume(";") {
-                inc = self.stmt();
+            if !self.token_iter.consume(")") {
+                // inc
+                inc = self.expr();
+                self.token_iter.consume(")");
             }
             self.token_iter.consume(")");
             then = self.stmt();
 
             node = new_node_for(init, cond, inc, then);
+        } else if self.token_iter.consume("while") {
+            // while ([cond]) [then]
+            let mut cond: Option<Box<Node<'_>>> = None;
+            let then: Option<Box<Node<'_>>>;
+            cond = self.expr();
+            then = self.stmt();
+            node = new_node_while(cond, then);
         } else {
             node = self.expr()
         }
-        self.token_iter.consume(";");
         /*if !(self.token_iter.consume(";")) {
             return None;
         }*/
+        self.token_iter.consume(";");
         node
     }
     fn assign(&mut self) -> Option<Box<Node<'a>>> {
@@ -248,6 +258,24 @@ fn new_node_for<'a>(
     Some(Box::new(node))
 }
 
+// forに対応した節を作る
+fn new_node_while<'a>(
+    cond: Option<Box<Node<'a>>>,
+    then: Option<Box<Node<'a>>>,
+) -> Option<Box<Node<'a>>> {
+    let node = Node {
+        kind: Token::Reserved("while"),
+        lhs: None,
+        rhs: None,
+        cond,
+        then,
+        els: None,
+        init: None,
+        inc: None,
+    };
+    Some(Box::new(node))
+}
+
 #[cfg(test)]
 mod test {
     use std::collections::{HashMap, HashSet};
@@ -316,7 +344,7 @@ mod test {
 
     #[test]
     fn debug_for() {
-        let mut iter = TokenIter { s: "for(i=0;i<5;i=i+1;) return 0;" };
+        let mut iter = TokenIter { s: "for(i=0;;) return 0;" };
         let mut vars = Variables {
             offsets: &mut HashMap::new(),
         };

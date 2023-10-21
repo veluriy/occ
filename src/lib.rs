@@ -77,7 +77,7 @@ pub fn run(input: Input) {
 
 fn generate_assembly(str: &str) -> String {
     let mut assembly = String::new();
-
+    let mut label_no = 0;
     assembly.push_str(".intel_syntax noprefix\n");
     assembly.push_str(".globl main\n");
     assembly.push_str("main:\n");
@@ -95,7 +95,7 @@ fn generate_assembly(str: &str) -> String {
     assembly.push_str(&format!("\tsub rsp, {}\n", &parser.vars.offsets.len() * 8));
 
     for node in nodes {
-        print_assembly_by_node(&node, parser.vars, &mut assembly);
+        print_assembly_by_node(&node, parser.vars, &mut assembly, &mut label_no);
         assembly.push_str("\tpop rax\n");
     }
     assembly.push_str("\tmov rsp, rbp\n");
