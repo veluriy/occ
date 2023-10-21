@@ -16,7 +16,12 @@ fn generate_lvar(node: &Node, vars: &Variables, assembly: &mut String) {
     }
 }
 
-pub fn print_assembly_by_node(node: &Node, vars: &Variables, assembly: &mut String, label_no: &mut u32) {
+pub fn print_assembly_by_node(
+    node: &Node,
+    vars: &Variables,
+    assembly: &mut String,
+    label_no: &mut u32,
+) {
     match node.kind {
         Token::Num(n) => {
             assembly.push_str(&format!("\tpush {}\n", n));
@@ -112,7 +117,7 @@ pub fn print_assembly_by_node(node: &Node, vars: &Variables, assembly: &mut Stri
             }
             assembly.push_str(&format!("\tjmp  .Lbegin{}\n", label_no));
             assembly.push_str(&format!(".Lend{}:\n", label_no));
-        }        
+        }
         Token::Operand(op) => {
             // '='の時は特別に、左辺値の扱いが他の二項演算と異なる。
             if op == "=" {

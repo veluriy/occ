@@ -200,8 +200,16 @@ fn new_node<'a>(
     lhs: Option<Box<Node<'a>>>,
     rhs: Option<Box<Node<'a>>>,
 ) -> Option<Box<Node<'a>>> {
-    Some(Box::new(Node { kind, lhs, rhs, cond: None, then: None, els: None,         init: None,
-        inc: None, }))
+    Some(Box::new(Node {
+        kind,
+        lhs,
+        rhs,
+        cond: None,
+        then: None,
+        els: None,
+        init: None,
+        inc: None,
+    }))
 }
 
 /// 数字に対応した節を作る
@@ -330,7 +338,9 @@ mod test {
 
     #[test]
     fn debug_if() {
-        let mut iter = TokenIter { s: "if 3 == 1 a=1;else a=0;" };
+        let mut iter = TokenIter {
+            s: "if 3 == 1 a=1;else a=0;",
+        };
         let mut vars = Variables {
             offsets: &mut HashMap::new(),
         };
@@ -344,7 +354,9 @@ mod test {
 
     #[test]
     fn debug_for() {
-        let mut iter = TokenIter { s: "for(i=0;;) return 0;" };
+        let mut iter = TokenIter {
+            s: "for(i=0;;) return 0;",
+        };
         let mut vars = Variables {
             offsets: &mut HashMap::new(),
         };
