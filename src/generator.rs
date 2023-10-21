@@ -95,7 +95,23 @@ pub fn print_assembly_by_node(node: &Node, vars: &Variables, assembly: &mut Stri
         }
         Token::Reserved("while") => {
             *label_no += 1;
-            // todo
+            assembly.push_str(&format!(".Lbegin{}:\n", label_no));
+            if let Some(b) = &node.cond {
+                print_assembly_by_node(b, vars, assembly, label_no);
+            } else {
+                // todo
+            }
+            assembly.push_str("\tpop rax\n");
+            assembly.push_str("\tcmp rax, 0\n");
+            assembly.push_str(&format!("\tje  .Lend{}\n", label_no));
+            // thenの実行
+            if let Some(b) = &node.then {
+                print_assembly_by_node(b, vars, assembly, label_no);
+            } else {
+                // todo
+            }
+            assembly.push_str(&format!("\tjmp  .Lbegin{}\n", label_no));
+            assembly.push_str(&format!(".Lend{}:\n", label_no));
         }        
         Token::Operand(op) => {
             // '='の時は特別に、左辺値の扱いが他の二項演算と異なる。
