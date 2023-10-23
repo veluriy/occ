@@ -38,6 +38,54 @@ impl TokenIter<'_> {
     }
 }
 
+fn delete_whitespaces(s: &str) -> &str {
+    s.trim_start()
+}
+
+fn make_token_vec(s: &str) -> Vec<Token> {
+    let s = delete_whitespaces(s);
+
+    // unimplemented
+    if s.is_empty() {
+        return vec![];
+    }
+
+    let operators = vec![
+        "+", "-", "*", "/", "(", ")", "<=", "=>", ">", "<", "==", "=",
+    ];
+
+    // operators
+    for op in operators {
+        if s.trim_start().starts_with(op) {
+            return [vec![Token::Operand(op)], make_token_vec(&s.trim_start()[op.len()..])].concat();
+        }
+    }
+
+    // alphabetic
+    if s.chars().next().unwrap().is_alphabetic() {
+        let first_non_alphabetic_idx =
+            s.chars().position(|c| !c.is_alphabetic() && c != '_').unwrap_or_else(|| {
+                panic!("An error occurred.");
+            });
+        let n = &s[..first_non_alphabetic_idx];
+        let tk = match is_reserved_words(n) {
+            true => Token::Reserved(n),
+            false => Token::LVar(n),
+        };
+        return [vec![tk], make_token_vec(&s[first_non_alphabetic_idx..])].concat();
+    }
+
+    // numeric
+    let (digit_s, remain_s) = split_digit(s);
+
+    if digit_s.is_empty() {
+       // todo
+        panic!("unexpected Token");
+    } else {
+        [vec![Token::Num(digit_s.parse().unwrap())], make_token_vec(remain_s)].concat()
+    }
+}
+
 /// トークナイザーの中身。
 /// やっていることは、次のトークンの判定を行い、内部の文字列を更新するだけ。
 impl<'a> Iterator for TokenIter<'a> {
@@ -53,7 +101,7 @@ impl<'a> Iterator for TokenIter<'a> {
 
         // > と =>のような部分列の関係にある文字列に注意
         let operands = vec![
-            "+", "-", "*", "/", "(", ")", "<=", "=>", ">", "<", "==", "=",
+            "+", "-", "*", "/", "(", ")", "<=", "=>", ">", "<", "==", "=", "{", "}",
         ];
         // operands.sort_by_key(f)
         for op in operands {
@@ -105,6 +153,7 @@ impl<'a> Iterator for TokenIter<'a> {
 
 #[cfg(test)]
 mod test {
+    use crate::lex::make_token_vec;
     use crate::types::TokenIter;
 
     #[test]
@@ -132,5 +181,10 @@ mod test {
         assert_eq!(" + 2 * 3", iter.s);
         println!("{:?}", iter.consume("+"));
         assert_eq!(" 2 * 3", iter.s);
+    }
+
+    #[test]
+    fn test_token() {
+        println!("{:?}", make_token_vec("int a =3"))
     }
 }
